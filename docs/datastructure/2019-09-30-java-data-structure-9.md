@@ -5,7 +5,8 @@ title: "JAVA 자료구조 뿌시기 -Map- #1 AbstractMap, HashMap편"
 tags: [JAVA, DataStructure, Map, AbstractMap, HashMap]
 comments: true
 nav_order: 9
-parent: Java
+parent: DataStructure
+grand_parent: Java
 ---
 
 

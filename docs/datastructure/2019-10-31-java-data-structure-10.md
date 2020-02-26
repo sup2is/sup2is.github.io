@@ -5,7 +5,8 @@ title: "JAVA 자료구조 뿌시기 -Map- #2 LinkedHashMap편"
 tags: [JAVA, DataStructure, Map, LinkedHashMap]
 comments: true
 nav_order: 10
-parent: Java
+parent: DataStructure
+grand_parent: Java
 ---
 
 

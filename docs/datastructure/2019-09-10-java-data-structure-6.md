@@ -5,7 +5,8 @@ title: "JAVA 자료구조 뿌시기 -Queue- #3 BlockingQueue , ArrayBlockingQueu
 tags: [JAVA, DataStructure, Queue, BlockingQueue, ArrayBlockingQueue]
 comments: true
 nav_order: 6
-parent: Java
+parent: DataStructure
+grand_parent: Java
 ---
 
 

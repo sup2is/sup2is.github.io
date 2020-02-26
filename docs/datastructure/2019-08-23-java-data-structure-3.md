@@ -4,7 +4,8 @@ title: "JAVA 자료구조 뿌시기 -List- #3 Vector, Stack편"
 tags: [JAVA, DataStructure, Vector, Stack]
 comments: true
 nav_order: 3
-parent: Java
+parent: DataStructure
+grand_parent: Java
 ---
 
 

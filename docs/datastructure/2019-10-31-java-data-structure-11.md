@@ -5,7 +5,8 @@ title: "JAVA 자료구조 뿌시기 -Map- #3 SortedMap, NavigableMap, TreeMap편
 tags: [JAVA, DataStructure, Map, SortedMap, NavigableMap, TreeMap]
 comments: true
 nav_order: 11
-parent: Java
+parent: DataStructure
+grand_parent: Java
 ---
 
 

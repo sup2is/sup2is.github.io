@@ -5,7 +5,8 @@ title: "JAVA 자료구조 뿌시기 -Queue- #2 ConcurrentLinkedQueue편"
 tags: [JAVA, DataStructure, Queue, ConcurrentLinkedQueue]
 comments: true
 nav_order: 5
-parent: Java
+parent: DataStructure
+grand_parent: Java
 ---
 
 

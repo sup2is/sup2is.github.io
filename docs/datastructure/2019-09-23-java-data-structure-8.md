@@ -5,7 +5,8 @@ title: "JAVA 자료구조 뿌시기 -Deque- #1 ArrayDeque편"
 tags: [JAVA, DataStructure, Deque, ArrayDeque]
 comments: true
 nav_order: 8
-parent: Java
+parent: DataStructure
+grand_parent: Java
 ---
 
 

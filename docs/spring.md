@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Java
+title: Spring
 nav_order: 2
-permalink: /java
+permalink: /spring
 has_children: true
 ---
 
 
 
-# Java
+# Spring
 

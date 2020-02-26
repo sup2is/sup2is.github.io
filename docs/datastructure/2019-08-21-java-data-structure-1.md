@@ -1,10 +1,11 @@
 ---
-layout: post
+layout: default
 title: "JAVA 자료구조 뿌시기 -List- #1 ArrayList편"
 comments: true
 tags: [JAVA, DataStructure, ArrayList]
 nav_order: 1
-parent: Java
+parent: DataStructure
+grand_parent: Java
 ---
 
 

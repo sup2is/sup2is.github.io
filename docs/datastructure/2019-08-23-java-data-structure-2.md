@@ -4,8 +4,13 @@ title: "JAVA 자료구조 뿌시기 -List- #2 LinkedList편"
 tags: [JAVA, DataStructure, LinkedList]
 comments: true
 nav_order: 2
-parent: Java
+parent: DataStructure
+grand_parent: Java
 ---
+
+
+
+
 
 
 

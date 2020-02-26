@@ -5,7 +5,8 @@ title: "JAVA 자료구조 뿌시기 -Queue- #4 DelayQueue, LinkedBlockingQueue, 
 tags: [JAVA, DataStructure, Queue, BlockingQueue, DelayQueue, LinkedBlockingQueue, PriorityBlockingQueue]
 comments: true
 nav_order: 7
-parent: Java
+parent: DataStructure
+grand_parent: Java
 ---
 
 

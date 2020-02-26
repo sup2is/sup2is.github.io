@@ -5,7 +5,8 @@ title: "JAVA 자료구조 뿌시기 -Queue- #1 PriorityQueue편"
 tags: [JAVA, DataStructure, Queue, PriorityQueue]
 comments: true
 nav_order: 4
-parent: Java
+parent: DataStructure
+grand_parent: Java
 ---
 
 

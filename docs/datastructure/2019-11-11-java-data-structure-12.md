@@ -5,7 +5,8 @@ title: "JAVA 자료구조 뿌시기 -Map- #4 EnumMap편"
 tags: [JAVA, DataStructure, Map, EnumMap]
 comments: true
 nav_order: 12
-parent: Java
+parent: DataStructure
+grand_parent: Java
 ---
 
 
