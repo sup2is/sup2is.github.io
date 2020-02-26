@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://sup2is.github.io/sitemap.xml

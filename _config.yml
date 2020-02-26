@@ -57,6 +57,9 @@ markdown: kramdown
 remote_theme: pmarsceill/just-the-docs
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
