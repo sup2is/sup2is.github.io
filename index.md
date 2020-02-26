@@ -1,6 +1,16 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-
-layout: home
+layout: default
+title: Home
+nav_order: 1
+permalink: /
 ---
+
+
+## 시작하며
+
+안녕하세요 저는 Junior java developer 입니다.
+배우고 싶은 기술이나 TIL 관련 글을 포스팅하는 블로그입니다.
+
+부족한 실력이라 영어 문장에 오역이 있을 수 있고 잘못된 지식을 전파 할 수 있습니다.
+피드백은 언제나 환영합니다. :)
+감사합니다.
