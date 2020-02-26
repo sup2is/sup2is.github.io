@@ -13,16 +13,47 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Your awesome title
-email: your-email@example.com
+title: sup2's TIL
+email: dev.sup2is@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Write an awesome description for your new site here. You can edit this
   line in _config.yml. It will appear in your document head meta (for
   Google search results) and in your feed.xml site description.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: jekyllrb
-github_username:  jekyll
+baseurl: "/" # the subpath of your site, e.g. /blog
+url: "https://sup2is.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+
+github_username: sup2is
+
+# Set a path/url to a logo that will be displayed instead of the title
+logo: "https://raw.githubusercontent.com/sup2is/sup2is.github.io/master/images/mycharliebrown2.jpeg"
+
+# Aux links for the upper right navigation
+aux_links:
+  "GitHub":
+    - "//github.com/sup2is/just-the-docs"
+
+# Heading anchor links appear on hover over h1-h6 tags in page content
+# allowing users to deep link to a particular heading on a page.
+#
+# Supports true (default) or false/nil
+heading_anchors: true
+
+# Enable or disable the site search
+# Supports true (default) or false
+search_enabled: true
+
+# Enable support for hyphenated search words:
+search_tokenizer_separator: /[\s/]+/
+
+# Text under the icons in footer
+footer_content: © sup2is blog powered by just-the-docs
+
+# Enter your Disqus shortname (not your username) to enable commenting on posts
+# You can find your shortname on the Settings page of your Disqus account
+disqus: sup2is
+
+# Enter your Google Analytics web tracking code (e.g. UA-2110908-2) to activate tracking
+google_analytics: UA-136379787-1
 
 # Build settings
 markdown: kramdown
