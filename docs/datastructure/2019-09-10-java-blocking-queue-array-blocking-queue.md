@@ -1,7 +1,7 @@
 ---
 
 layout: post
-title: "JAVA 자료구조 뿌시기 -Queue- #3 BlockingQueue , ArrayBlockingQueue편"
+title: "Java의 BlockingQueue, ArrayBlockingQueue"
 tags: [JAVA, DataStructure, Queue, BlockingQueue, ArrayBlockingQueue]
 comments: true
 nav_order: 6

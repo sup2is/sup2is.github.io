@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "JAVA 자료구조 뿌시기 -List- #3 Vector, Stack편"
+title: "Java의 Vector, Stack"
 tags: [JAVA, DataStructure, Vector, Stack]
 comments: true
 nav_order: 3

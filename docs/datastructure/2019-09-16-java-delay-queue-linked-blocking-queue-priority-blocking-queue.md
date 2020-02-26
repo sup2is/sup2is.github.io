@@ -1,7 +1,7 @@
 ---
 
 layout: post
-title: "JAVA 자료구조 뿌시기 -Queue- #4 DelayQueue, LinkedBlockingQueue, PriorityBlockingQueue편"
+title: "Java의 DelayQueue, LinkedBlockingQueue, PriorityBlockingQueue"
 tags: [JAVA, DataStructure, Queue, BlockingQueue, DelayQueue, LinkedBlockingQueue, PriorityBlockingQueue]
 comments: true
 nav_order: 7

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "JAVA 자료구조 뿌시기 -List- #2 LinkedList편"
+title: "Java의 LinkedList"
 tags: [JAVA, DataStructure, LinkedList]
 comments: true
 nav_order: 2

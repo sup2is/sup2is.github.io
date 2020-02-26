@@ -1,7 +1,7 @@
 ---
 
 layout: post
-title: "JAVA 자료구조 뿌시기 -Queue- #1 PriorityQueue편"
+title: "Java의 PriorityQueue"
 tags: [JAVA, DataStructure, Queue, PriorityQueue]
 comments: true
 nav_order: 4

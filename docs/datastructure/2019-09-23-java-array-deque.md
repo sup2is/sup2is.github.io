@@ -1,7 +1,7 @@
 ---
 
 layout: post
-title: "JAVA 자료구조 뿌시기 -Deque- #1 ArrayDeque편"
+title: "Java의 ArrayDeque"
 tags: [JAVA, DataStructure, Deque, ArrayDeque]
 comments: true
 nav_order: 8

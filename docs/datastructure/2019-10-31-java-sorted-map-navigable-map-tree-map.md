@@ -1,7 +1,7 @@
 ---
 
 layout: post
-title: "JAVA 자료구조 뿌시기 -Map- #3 SortedMap, NavigableMap, TreeMap편"
+title: "Java의 SortedMap, NavigableMap, TreeMap"
 tags: [JAVA, DataStructure, Map, SortedMap, NavigableMap, TreeMap]
 comments: true
 nav_order: 11

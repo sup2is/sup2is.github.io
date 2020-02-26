@@ -1,7 +1,7 @@
 ---
 
 layout: post
-title: "JAVA 자료구조 뿌시기 -Map- #4 EnumMap편"
+title: "Java의 EnumMap"
 tags: [JAVA, DataStructure, Map, EnumMap]
 comments: true
 nav_order: 12

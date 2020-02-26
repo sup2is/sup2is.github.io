@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "JAVA 자료구조 뿌시기 -List- #1 ArrayList편"
+title: "Java의 ArrayList"
 comments: true
 tags: [JAVA, DataStructure, ArrayList]
 nav_order: 1

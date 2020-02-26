@@ -1,7 +1,7 @@
 ---
 
 layout: post
-title: "JAVA 자료구조 뿌시기 -Map- #1 AbstractMap, HashMap편"
+title: "Java의 AbstractMap, HashMap"
 tags: [JAVA, DataStructure, Map, AbstractMap, HashMap]
 comments: true
 nav_order: 9

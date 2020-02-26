@@ -1,7 +1,7 @@
 ---
 
 layout: post
-title: "JAVA 자료구조 뿌시기 -Queue- #2 ConcurrentLinkedQueue편"
+title: "Java의 ConcurrentLinkedQueue"
 tags: [JAVA, DataStructure, Queue, ConcurrentLinkedQueue]
 comments: true
 nav_order: 5
