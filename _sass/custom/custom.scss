@@ -127,3 +127,14 @@ $search-results-width: 800px;
 //lg: $content-width + $nav-width,
 //xl: 1400px
 //);
+
+.date-time {
+	text-align: right; 
+	font-size: 12px !important;
+}
+
+blockquote {
+	border-left: 2px solid #eee;
+	padding-left: 15px;
+	margin-left: 5px;
+}

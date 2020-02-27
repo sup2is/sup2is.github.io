@@ -49,6 +49,7 @@ layout: table_wrappers
         </div>
         <div class="page">
           {% unless page.url == "/" %}
+          <div class="date-time">{{ page.date | date: “%m/%d/%Y” }}</div>
             {% if page.parent %}
               <nav class="breadcrumb-nav">
                 <ol class="breadcrumb-nav-list">
