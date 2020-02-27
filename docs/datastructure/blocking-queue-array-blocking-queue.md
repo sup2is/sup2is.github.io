@@ -1,9 +1,10 @@
 ---
 
 layout: post
-title: "Java의 BlockingQueue, ArrayBlockingQueue"
+title: "BlockingQueue, ArrayBlockingQueue"
 tags: [JAVA, DataStructure, Queue, BlockingQueue, ArrayBlockingQueue]
 comments: true
+date: 2019-09-10
 nav_order: 6
 parent: DataStructure
 grand_parent: Java

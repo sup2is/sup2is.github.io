@@ -1,8 +1,9 @@
 ---
 layout: default
-title: "Java의 ArrayList"
+title: "ArrayList"
 comments: true
 tags: [JAVA, DataStructure, ArrayList]
+date: 2019-08-21
 nav_order: 1
 parent: DataStructure
 grand_parent: Java

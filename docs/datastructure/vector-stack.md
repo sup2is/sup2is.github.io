@@ -1,7 +1,8 @@
 ---
 layout: post
-title: "Java의 Vector, Stack"
+title: "Vector, Stack"
 tags: [JAVA, DataStructure, Vector, Stack]
+date: 2019-08-23
 comments: true
 nav_order: 3
 parent: DataStructure

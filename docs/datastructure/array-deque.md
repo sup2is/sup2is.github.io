@@ -1,8 +1,9 @@
 ---
 
 layout: post
-title: "Java의 ArrayDeque"
+title: "ArrayDeque"
 tags: [JAVA, DataStructure, Deque, ArrayDeque]
+date: 2019-09-23
 comments: true
 nav_order: 8
 parent: DataStructure

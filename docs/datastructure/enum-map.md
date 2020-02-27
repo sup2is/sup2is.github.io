@@ -1,9 +1,10 @@
 ---
 
 layout: post
-title: "Java의 EnumMap"
+title: "EnumMap"
 tags: [JAVA, DataStructure, Map, EnumMap]
 comments: true
+date: 2019-11-11
 nav_order: 12
 parent: DataStructure
 grand_parent: Java

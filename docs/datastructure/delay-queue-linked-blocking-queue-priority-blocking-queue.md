@@ -1,8 +1,9 @@
 ---
 
 layout: post
-title: "Java의 DelayQueue, LinkedBlockingQueue, PriorityBlockingQueue"
+title: "DelayQueue, LinkedBlockingQueue, PriorityBlockingQueue"
 tags: [JAVA, DataStructure, Queue, BlockingQueue, DelayQueue, LinkedBlockingQueue, PriorityBlockingQueue]
+date: 2019-09-16
 comments: true
 nav_order: 7
 parent: DataStructure

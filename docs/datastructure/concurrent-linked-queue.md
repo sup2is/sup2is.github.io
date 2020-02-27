@@ -1,8 +1,9 @@
 ---
 
 layout: post
-title: "Java의 ConcurrentLinkedQueue"
+title: "ConcurrentLinkedQueue"
 tags: [JAVA, DataStructure, Queue, ConcurrentLinkedQueue]
+date: 2019-09-10
 comments: true
 nav_order: 5
 parent: DataStructure

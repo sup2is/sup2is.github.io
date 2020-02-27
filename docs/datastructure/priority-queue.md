@@ -1,8 +1,9 @@
 ---
 
 layout: post
-title: "Java의 PriorityQueue"
+title: "PriorityQueue"
 tags: [JAVA, DataStructure, Queue, PriorityQueue]
+date: 2019-08-28
 comments: true
 nav_order: 4
 parent: DataStructure

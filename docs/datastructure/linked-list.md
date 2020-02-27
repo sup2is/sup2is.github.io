@@ -1,8 +1,9 @@
 ---
 layout: post
-title: "Java의 LinkedList"
+title: "LinkedList"
 tags: [JAVA, DataStructure, LinkedList]
 comments: true
+date: 2019-08-23
 nav_order: 2
 parent: DataStructure
 grand_parent: Java

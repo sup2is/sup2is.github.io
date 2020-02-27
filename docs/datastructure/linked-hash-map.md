@@ -1,9 +1,10 @@
 ---
 
 layout: post
-title: "Java의 LinkedHashMap"
+title: "LinkedHashMap"
 tags: [JAVA, DataStructure, Map, LinkedHashMap]
 comments: true
+date: 2019-10-31
 nav_order: 10
 parent: DataStructure
 grand_parent: Java
