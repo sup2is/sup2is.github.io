@@ -4,7 +4,8 @@ layout: table_wrappers
 
 <!DOCTYPE html>
 
-<html lang="{{ site.lang | default: "en-US" }}">
+<html lang="{{ site.lang | default: "ko-KR" }}">
+<script data-ad-client="ca-pub-1307084420750291" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 {% include head.html %}
 <body>
   <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -85,7 +86,7 @@ layout: table_wrappers
               {% endfor %}
             </ul>
           {% endif %}
-
+          {% include disqus.html %}
           {% if site.footer_content != nil %}
             <hr>
             <footer role="contentinfo">
@@ -98,5 +99,6 @@ layout: table_wrappers
     </div>
   </div>
 
+  {% include analytics.html %}
 </body>
 </html>
