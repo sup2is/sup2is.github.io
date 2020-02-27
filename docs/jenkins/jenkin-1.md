@@ -5,6 +5,7 @@ tags: [CI, Jenkins , Jenkins in Docker]
 comments: true
 nav_order: 5
 date: 2019-06-26
+parent: Jenkins
 ---
 
 
