@@ -25,7 +25,7 @@ github_username: sup2is
 # Aux links for the upper right navigation
 aux_links:
   "GitHub":
-    - "//github.com/sup2is/just-the-docs"
+    - "//github.com/sup2is"
 
 # Heading anchor links appear on hover over h1-h6 tags in page content
 # allowing users to deep link to a particular heading on a page.
