@@ -69,6 +69,9 @@ layout: table_wrappers
             {% if site.heading_anchors != false %}
               {% include vendor/anchor_headings.html html=content beforeHeading="true" anchorBody="<svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><use xlink:href=\"#link\"></use></svg>" anchorClass="anchor-heading" %}
             {% else %}
+              {% if page.has_children == false %}
+                {% include header_ads.html %}
+              {% endif %}
               {{ content }}
             {% endif %}
 
@@ -86,7 +89,6 @@ layout: table_wrappers
               {% endfor %}
             </ul>
           {% endif %}
-          {% include footer_ads.html %}
           {% include disqus.html %}
           {% if site.footer_content != nil %}
             <hr>
@@ -94,7 +96,7 @@ layout: table_wrappers
               <p class="text-small text-grey-dk-000 mb-0">{{ site.footer_content }}</p>
             </footer>
           {% endif %}
-
+          {% include footer_ads.html %}
         </div>
       </div>
     </div>
