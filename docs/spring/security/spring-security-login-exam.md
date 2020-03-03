@@ -3,7 +3,7 @@ layout: post
 title: "Spring Security로 InMemory 로그인 구현하기"
 tags: [Spring Framework, Spring Security, Login]
 comments: true
-date: 2019-03-02
+date: 2020-03-02
 parent: Security
 grand_parent: Spring
 ---

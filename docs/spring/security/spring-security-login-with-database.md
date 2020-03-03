@@ -3,7 +3,7 @@ layout: post
 title: "Spring Security로 Database 로그인 구현하기"
 tags: [Spring Framework, Spring Security, Login, Database]
 comments: true
-date: 2019-03-03
+date: 2020-03-03
 parent: Security
 grand_parent: Spring
 ---
