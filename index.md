@@ -1,8 +1,9 @@
 ---
-layout: default
+layout: index
 title: Home
 nav_order: 1
 permalink: /
+exclude: true
 ---
 
 
