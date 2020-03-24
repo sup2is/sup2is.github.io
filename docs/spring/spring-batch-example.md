@@ -41,7 +41,7 @@ WANR : Bla Bla...
 
 
 
-# Spring Boot 2.2.5
+# Example (Spring Boot 2.2.5)
 
 예제는 역시 Spring Boot 로 진행한다. https://start.spring.io/ 
 
@@ -178,6 +178,44 @@ ERROR : Application throws Exception !!
 현업이라면 비교도안될만큼 간단하지만 감잡기엔 충분하다고 생각한다 ....
 
 <br>
+
+spring batch에는 database, file 등등을 읽거나 쓸 수 있는 **ItemReader**와 **ItemWriter**들이 존재한다. 그리고 그 사이에 존재하는 **ItemProcessor**를 통해 읽어들인 데이터에 비지니스 로직을 삽입할 수 있다. 간단하게 개념만 알아보자
+
+## ItemReader
+
+spring batch의 ItemReader 다양한 유형의 입력에서 데이터를 제공해주는 interface가 된다.
+
+- Flat File : 플랫 파일에서 일반적으로 파일의 고정 위치에 의해 정의되거나 일부 특수 문자 (예 : 쉼표)로 구분 된 데이터 필드가있는 레코드를 설명하는 데이터 행을 읽을 수 있다.
+- XML : XML ItemReader는 객체 구문 분석, 매핑 및 유효성 검사에 사용되는 기술과 독립적으로 XML을 처리한다. 입력 데이터를 사용하면 XSD 스키마에 대한 XML 파일의 유효성을 검증 할 수 있다.
+- DataBase : 데이터베이스 리소스에 액세스하여 처리 할 개체에 매핑 할 수있는 결과 집합을 반환한다. 기본 SQL ItemReader 구현은 RowMapper를 호출하여 오브젝트를 리턴하고, 재시작이 필요한 경우 현재 행을 추적하고, 기본 통계를 저장하며, 나중에 설명 할 트랜잭션 개선 사항을 제공한다.
+
+> ```java
+> public interface ItemReader<T> {
+> 
+>     T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException;
+> 
+> }
+> ```
+
+read()를 통해 하나의 항목을 반환하거나 더이상 읽어올것이 없으면 null을 반환한다. 우리가 위에 만들어놓은 Log 객체와 매핑된다
+
+<br>
+
+## ItemWriter
+
+spring batch의 ItemWriter는 ItemReader와 유사하지만 주로 쓰는작업에 사용한다. Database에 insert하거나 update할 수 있다.
+
+> ```java
+> public interface ItemWriter<T> {
+> 
+>     void write(List<? extends T> items) throws Exception;
+> 
+> }
+> ```
+
+## ItemProcessor
+
+실제 비지니스로직이 들어가는 부분은 **ItemProcessor**다
 
 
 
