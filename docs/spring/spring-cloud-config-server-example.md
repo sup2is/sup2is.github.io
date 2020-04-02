@@ -21,7 +21,7 @@ Spring Cloud에서는 수십 또는 수백가지의 어플리케이션들의 Con
 
 # Why?
 
-보통의 웹 어플리케이션이라면 어플리케이션과 Configuration은 함께 배포되는게 맞다. 하지만 MSA의 관점에서는 수십 또는 수백가지의 어플리케이션들의 Configuration들이 각각 개별 어플리케이션 배포에 포함되어있다면 추후 유지보수가 굉장히 힘들어질 것이다. 따라서 Spring Cloud는 Spring Cloud Config Server를 통해서 Configuration 중앙 집중화를 통하여 각각 어플리케이션들의 Configuration들을 효율적으로 관리할 수 있도록 도와준다.
+보통의 웹 어플리케이션이라면 어플리케이션과 Configuration은 함께 배포되는게 맞다. 하지만 MSA의 관점에서는 수십 또는 수백가지의 어플리케이션들의 Configuration들이 각각 개별 어플리케이션 배포에 포함되어있다면 추후 유지보수가 굉장히 힘들어질 것이다. 따라서 Spring Cloud는 Spring Cloud Config Server를 통해서 Configuration 중앙 집중화를 구현한다. Spring Cloud Config Server는 각각 어플리케이션들의 Configuration들을 효율적으로 관리할 수 있도록 도와준다.
 
 
 
@@ -112,7 +112,7 @@ public class ConfigurationServerApplication {
 
 ```
 
-**@EnableConfigServer** Spring 공홈에도 자세한 역할을 제대로 찾지는 못해서 정확하게 이런 어노테이션이다라고 설명은 불가능하나 아무래도 Spring Config Server 관련한 부분을 Spring Boot가 자동으로 설정해주도록 도와주는 어노테이션이지 않을까 싶다.
+**@EnableConfigServer** Spring 공홈에도 자세한 역할을 제대로 찾지는 못해서 정확하게 이런 어노테이션이다라고 설명은 불가능하나 아무래도 Spring Config Server 관련한 부분을 Spring Boot가 자동으로 설정해주도록 도와주는 어노테이션이지 않을까 싶다. 자동으로 설정해주는 부분은 아래 실습에서 확인할 수 있다.
 
 <br>
 
@@ -134,7 +134,7 @@ spring:
           searchPaths: fooservice
 ```
 
-마지막으로 application.yml에 **spring.cloud.config.server.git**에 대한 설정을 해준다 나같은경우는 미리 준비해놓은 repository를 바라보도록 설정했다. 실제 서비스의 이름이 될 **fooservice**를 설정해 놓았다 n개의 서비스가 존재한다면 뒤에 `,`를 활용해서 추가하면된다. 실제 [config-repo](https://github.com/sup2is/config-repo) 에서 확인할 수 있다.
+마지막으로 application.yml에 **spring.cloud.config.server.git**에 대한 설정을 해준다 나같은경우는 미리 준비해놓은 repository를 바라보도록 설정했다. 실제 서비스의 이름이 될 **fooservice**를 설정해 놓았다 n개의 서비스가 존재한다면 뒤에 `,`를 활용해서 추가하면된다. 실제 파일들의 내용을 확인하고싶다면 [config-repo](https://github.com/sup2is/config-repo) 에서 확인할 수 있다.
 
 <br>
 
@@ -152,7 +152,9 @@ spring.datasource.password: "password"
 
 <br>
 
-설정이 만약 제대로 됐다는 가정하에 실제 Spring Cloud Config Server를 동작시키고 postman을 이용하여 http요청을 날려보자
+설정이 만약 제대로 됐다는 가정하에 실제 Spring Cloud Config Server를 동작시키고 postman을 이용하여 **127.0.0.1:8888/fooservice/dev** 로 http요청을 날려보자
+
+
 
 ![주석 2020-04-01 215551](https://user-images.githubusercontent.com/30790184/78141864-128e7180-7467-11ea-8e42-fb0646bb0725.png)
 
@@ -162,7 +164,7 @@ default 설정은 **/{service-name}/default**를 이용하여 가져올 수 있�
 
 <br>
 
-만약 추가적인 사용법을 알고싶다면 Spring Boot가 최초에 로딩될때 로그를 보면 다음과 같은 endpoint를 만들어주는것을 확인할 수 있다.
+properties 설정 외에도 다른 endpoint를 Spring Boot에서 자동으로 만들어주는데 사용법을 알고싶다면 Spring Boot가 최초에 로딩될때 로그를 보면 다음과 같은 endpoint를 만들어주는것을 확인할 수 있다.
 
 ![주석 2020-04-01 221947](https://user-images.githubusercontent.com/30790184/78141873-13bf9e80-7467-11ea-82bc-ee8dfb01397b.png)
 
@@ -178,7 +180,7 @@ default 설정은 **/{service-name}/default**를 이용하여 가져올 수 있�
 
 
 
-다음시간에는 이제 fooservice를 작성해서 최초에 어플리케이션 로딩시점에 config server와 통신하여 어플리케이션을 설정하는 방법과 config server에서 configuration이 변경되었을때 변경사항을 적용시키는 방법에 대해서 알아보도록 하겠다.
+다음시간에는 이제 fooservice를 작성해서 최초에 어플리케이션 로딩시점에 config server와 통신하여 어플리케이션을 설정하는 방법과 config server에서 configuration이 내용이 변경되었을때 변경사항을 적용시키는 방법에 대해서 알아보도록 하겠다.
 
 
 
@@ -188,7 +190,7 @@ default 설정은 **/{service-name}/default**를 이용하여 가져올 수 있�
 
 포스팅은 여기까지 하겠습니다.  모든예제는 제 github에서 확인하실 수 있습니다.
 
-예제 : https://github.com/sup2is/spring-example/tree/master/spring-batch-example 
+예제 : https://github.com/sup2is/spring-example/tree/master/spring-cloud-config-example
 
 
 
@@ -196,6 +198,6 @@ default 설정은 **/{service-name}/default**를 이용하여 가져올 수 있�
 
 References
 
--  https://docs.spring.io/spring-batch/docs/4.2.x/reference/html/readersAndWriters.html#readersAndWriters 
--  https://spring.io/projects/spring-batch#learn 
+-  Spring 마이크로서비스 코딩 공작소 -존 카넬 (길벗출판사)
+-  https://spring.io/projects/spring-cloud-config#overview
 
