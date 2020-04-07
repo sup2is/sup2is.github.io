@@ -4,7 +4,8 @@ title: "Spring Cloud Config Server로 Configuration 관리하기"
 tags: [Spring Boot, Spring Cloud, Spring Cloud Config]
 date: 2020-04-01
 comments: true
-parent: Spring
+grand_parent: Spring
+parent: Cloud
 ---
 
 
