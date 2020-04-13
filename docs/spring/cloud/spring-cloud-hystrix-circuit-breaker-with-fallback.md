@@ -374,7 +374,7 @@ MemberService가 타임아웃으로 몇차례 종료되더니 어느순간 이�
 
 포스팅은 여기까지 하겠습니다.  모든예제는 제 github에서 확인하실 수 있습니다.
 
-예제 : https://github.com/sup2is/spring-example/tree/master/spring-cloud-eureka-with-netfix-feign-client
+예제 : https://github.com/sup2is/spring-example/tree/master/spring-cloud-hystrix
 
 
 
