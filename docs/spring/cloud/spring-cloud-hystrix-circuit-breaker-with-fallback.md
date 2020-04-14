@@ -356,17 +356,29 @@ MemberService가 타임아웃으로 몇차례 종료되더니 어느순간 이�
 
 ## 몇가지 알고가기
 
+### 스레드 컨텍스트와 히스트릭스
 
+@HystrixCommand가 실행될 때 개발자는 Thread 격리 방식, Semaphore 격리 방식을 선택할 수 있다. 기본적으로 히스트릭스는 Thread 격리 방식을 사용하는데 이 방식은 호출을 시도한 부모 스레드와 컨텍스트를 공유하지 않고 격리된 스레드 풀에서 수행된다. 이런 전략은 히스트릭스가 자기 통제 하에서 원래 호출을 시도한 부모 스레드와 연관된 어떤 활동도 방해햐지 않고 스레드를 중단할 수 있다는 것을 의미한다.
 
+Semaphore 격리 방식은 히스트릭스는 새로운 스레드를 시작하지 않고 @HystrixCommand 어노테이션이 보호하는 분산 호출을 관리하며 타임아웃이 발생하면 부모 스레드를 중단시킨다.
 
+```java
+@HystrixCommand(
+  commandProperties = {
+    @HystrixProperty(
+      name="execution.isolation.strategy", value="SEMAPHORE"
+    )
+  }
+)
+```
 
+넷플릭스 역시 기본적으로 Thread 격리 방식을 추천하고 Thread 전략이 Semaphore 전략보다 격리 수준이 더 높다. Semaphore는 Netty같은 비동기 I/O 컨테이너를 적용할때 고려해야한다.
 
+### ThreadLocal과 히스트릭스
 
+기본적으로 히스트릭스는 부모 스레드의 컨텍스트를 히스트릭스 명령이 관리하는 스레드에 전파하지 않는다. 예를들면 Spring Securty에서 ThreadLocal 전략으로 UserContext 객체를 저장해서 하나의 컨텍스트에서 항상 UserContext 객체를 꺼내올 수 있지만 히스트릭스로 @HystrixCommand로 감싸진 부분은 전파되지 않는다.
 
-
-
-
-
+다행히 히스트릭스와 스프링클라우드는 부모 스레드의 컨텍스트를 히스트릭스 스레드 풀이 관리하는 스레드에 전달하는 메커니즘을 제공한다. 이 메커니즘을 **HystrixConcurrencyStrategy**라고한다. HystrixConcurrencyStrategy에 대한 자세한 설명은 생략한다.
 
 
 
