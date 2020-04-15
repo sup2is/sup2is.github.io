@@ -3,7 +3,7 @@
 layout: post
 title: "Spring Cloud에서 Zuul로 Service Gateway 구현하기"
 tags: [Spring Boot, Spring Cloud, Netflix Zuul, Service Gateway]
-date: 2020-04-12
+date: 2020-04-15
 comments: true
 grand_parent: Spring
 parent: Cloud
@@ -48,6 +48,10 @@ parent: Cloud
 
 
 # Zuul을 사용해서 서비스 게이트웨이 구현하기
+
+이 예제는 아래의 아키텍쳐를 기반으로 구성한다.
+
+![주석 2020-04-15 105539](https://user-images.githubusercontent.com/30790184/79290703-cd0e8180-7f07-11ea-9179-703e88649245.png)
 
 넷플릭스의 Zuul은 Spring Boot를 사용하면 아주아주 간단하게 구성 가능하다.
 
