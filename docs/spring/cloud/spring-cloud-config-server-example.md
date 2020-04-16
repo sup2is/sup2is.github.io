@@ -159,15 +159,15 @@ example.property 라는 사용자 설정과 spring에서 사용하는 spring.dat
 
 <br>
 
-설정이 만약 제대로 됐다는 가정하에 실제 Spring Cloud Config Server를 동작시키고 postman을 이용하여 **127.0.0.1:8888/fooservice/dev** 로 http요청을 날려보자
+설정이 만약 제대로 됐다는 가정하에 실제 Spring Cloud Config Server를 동작시키고 postman을 이용하여 **http://127.0.0.1:8088//fooservice/dev** 로 http요청을 날려보자
 
 
 
 ![주석 2020-04-01 215551](https://user-images.githubusercontent.com/30790184/78141864-128e7180-7467-11ea-8e42-fb0646bb0725.png)
 
-놀랍게도 다음과 같이 추가적인 코드 작성 없이도 Spring Cloud Config Server가 알아서 service에 해당하는 endpoint를 알아서 만들어준다. 사용법은 **/{service-name}/{profile}** 이다. 
+놀랍게도 다음과 같이 추가적인 코드 작성 없이도 Spring Cloud Config Server가 알아서 service에 해당하는 endpoint를 알아서 만들어준다. 사용법은 **http://127.0.0.1:8088/{service-name}/{profile}** 이다. 
 
-default 설정은 **/{service-name}/default**를 이용하여 가져올 수 있다.
+default 설정은 **http://127.0.0.1:8088/{service-name}/default**를 이용하여 가져올 수 있다.
 
 <br>
 
@@ -200,7 +200,7 @@ default 설정은 **/{service-name}/default**를 이용하여 가져올 수 있�
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.6.RELEASE</version>
+        <version>2.0.3.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>me.sup2is</groupId>
@@ -220,7 +220,22 @@ default 설정은 **/{service-name}/default**를 이용하여 가져올 수 있�
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-config-client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
     </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Finchley.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <build>
         <plugins>
             <plugin>
@@ -229,13 +244,11 @@ default 설정은 **/{service-name}/default**를 이용하여 가져올 수 있�
             </plugin>
         </plugins>
     </build>
-
-
-
+    
 </project>
 ```
 
-별다른 설정은 없고  **spring-cloud-starter-config** 모듈과 **spring-cloud-config-client**모듈을 추가해줬다.
+별다른 설정은 없고  **spring-cloud-starter-config** 모듈과 **spring-cloud-config-client**모듈을 추가해줬다. 추가로 **spring-boot-starter-actuator** 모듈을 추가해줬는데 아래에서 **@RefreshScope**사용을 위해 추가했다 @RefreshScope은 아래에서 소개한다.
 
 <br>
 
@@ -246,47 +259,39 @@ default 설정은 **/{service-name}/default**를 이용하여 가져올 수 있�
 ```java
 package me.sup2is.fooservice;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
+@RestController
+@RefreshScope
 public class FooServiceApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(FooServiceApplication.class, args);
     }
-}
-```
-
-
-
-<br>
-
-**PropertyComponent.java**
-
-```java
-package me.sup2is.fooservice;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-
-@Component
-public class PropertyComponent {
 
     @Value("${example.property}")
     private String exampleProperty;
 
-    @PostConstruct
-    public void doSomething() {
-        System.out.println(exampleProperty);
+    @GetMapping("/my-property")
+    public String getProperty() {
+        return exampleProperty;
     }
 
 }
+
 ```
 
-위에 있는 PropertyComponent 클래스는 Spring Cloud Config Server에게 받은 Configuration에서 **${example.property}**의 key를 가진 값을 불러오도록 설정했다. @PostConstruct를 이용해서 최초에 PropertyComponent이 초기화 된 이후에 **${example.property}** 값을 출력하도록 설정해 두었다.
+
+
+위에 있는 FooServiceApplication 클래스는 Spring Cloud Config Server에게 받은 Configuration에서 **${example.property}**의 key를 가진 값을 불러오도록 설정했다. /my-property로 요청했을때 그 값을 반환하도록 설정했다.
+
+
 
 <br>
 
@@ -302,9 +307,18 @@ spring:
   cloud:
     config:
       uri: http://127.0.0.1:8888
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
 ```
 
 위 설정에는 spring config server가 해당 서비스를 인식할 수 있도록 **spring.application.name**에 현재 서비스의 이름인 **fooservice**를 입력했다. 이후에 profiles 속성도 dev나 default 등의 다양한 설정이 가능하다. 마지막으로 이전에 설정해 놓은 Spring Cloud Config Server와 매핑 될 수 있도록 **http://127.0.0.1:8888**을 설정해 놓았다.
+
+추가적으로 **management.endpoints:web:exposure.include**로 refresh를 설정해 놓았는데 FooServiceApplication 클래스에 설정해놓은 **@RefreshScope**와 연관이 매우 깊다. 이렇게 설정해놓고 만약 ${example.property} 같은 사용자 정의 프로퍼티값에 변경이 필요하다면 github에 있는 configuration repository에서 변경 후 POST로 http://127.0.0.1:8080/actuator/refresh로 요청하면 변경사항이 어플리케이션의 재시작 없이 자동적으로 이루어진다. 하지만 이런 기능은 사용자 정의 프로퍼티만 가능하며 데이터베이스설정이나 스프링 데이터에서 정의된 내용은 반영되지 않는다.
 
 <br>
 
@@ -318,11 +332,13 @@ spring:
 
 <br>
 
-![주석 2020-04-02 144155](https://user-images.githubusercontent.com/30790184/78214394-1dd9af80-74f0-11ea-9dc5-de45503eb577.png)
 
 
 
-만약 Configuration의 변경사항이 있다면 **@RefreshScope**를 이용해서 서비스들에게 변경사항을 전달하는 방법이 있는데 이 글에서는 다루지 않도록 하겠다.
+
+![주석 2020-04-16 170423](https://user-images.githubusercontent.com/30790184/79430734-5a370080-8004-11ea-9b86-845a816a9b68.png)
+
+
 
 
 
