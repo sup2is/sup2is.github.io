@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: post
 title: Git Fork한 저장소를 original 저장소로 동기화 시키기
 parent: Git
 date: 2020-02-28

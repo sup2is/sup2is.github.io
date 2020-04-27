@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: post
 title: Git Untracked file들 지우기
 parent: Git
 date: 2020-02-28
