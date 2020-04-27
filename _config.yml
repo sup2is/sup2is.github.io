@@ -1,74 +1,59 @@
-# Welcome to Jekyll!
-#
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely edit after that. If you find
-# yourself editing this file very often, consider using Jekyll's data files
-# feature for the data you need to update frequently.
-#
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+# Site Settings
+baseurl: ""
+url : "https://sup2is.github.io"
 
-# Site settings
-# These are used to personalize your new site. If you look in the HTML files,
-# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
-# You can create any custom variable you would like, and they will be accessible
-# in the templates via {{ site.myvariable }}.
-title: Sup2is Blog
-email: dev.sup2is@gmail.com
-description: >- # this means to ignore newlines until "baseurl:"
-  Welcome to sup2is blog
-baseurl: "/" # the subpath of your site, e.g. /blog
-url: "https://sup2is.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+# Blog Settings
+theme_settings :
+  title : Sup2is blog
+  favicon : assets/favicon.ico
 
-github_username: sup2is
+  # Profile Settings
+  profile :
+    image : assets/img/smile.jpg
+    username : HyeonSeop Choi
+    description : 안녕하세요 저는 Junior java developer 입니다. 배우고 싶은 기술이나 TIL 관련 글을 포스팅하는 블로그입니다. 부족한 실력이라 영어 문장에 오역이 있을 수 있고 잘못된 지식을 전파 할 수 있습니다. 피드백은 언제나 환영합니다. :) 감사합니다.
+    experience :
+      - start : 2018-05-03
+        end : 2018-05-06
+        experience : company name, title
+    skills : 
+      - skill : Java
+        value : 80  # Percent value
+      - skill : Spring
+        value : 80  # Percent value
+      - skill : SQL
+        value : 50  # Percent value
+      - skill : HTML & CSS3
+        value : 30  # Percent value
+      - skill : JavaScript
+        value : 30  # Percent value
+      - skill : Vue
+        value : 30  # Percent value
 
-# Aux links for the upper right navigation
-aux_links:
-  "GitHub":
-    - "//github.com/sup2is"
+  # Icons
+  icons :
+    email: dev.sup2is@gmail.com # Full email address, e.g. "sample@google.com"
+    linkedin:  # Full URL 
+    github: sup2is
+    gitlab: 
+    bitbucket: 
+    google_plus:
+    twitter:
+    youtube:
+    facebook:
+    instagram:
 
-# Heading anchor links appear on hover over h1-h6 tags in page content
-# allowing users to deep link to a particular heading on a page.
-#
-# Supports true (default) or false/nil
-heading_anchors: true
+  # Disqus
+  disqus_shortname : sup2is
 
-# Enable or disable the site search
-# Supports true (default) or false
-search_enabled: true
+# Pagination
+paginate: 7
+paginate_path: "blog/page:num"
 
-# Enable support for hyphenated search words:
-search_tokenizer_separator: /[\s/]+/
-
-# Text under the icons in footer
-footer_content: © sup2is blog powered by just-the-docs
-
-# Enter your Disqus shortname (not your username) to enable commenting on posts
-# You can find your shortname on the Settings page of your Disqus account
-disqus: sup2is
-
-# Enter your Google Analytics web tracking code (e.g. UA-2110908-2) to activate tracking
-google_analytics: UA-136379787-1
-
-# Build settings
-markdown: kramdown
-remote_theme: pmarsceill/just-the-docs
-plugins:
-  - jekyll-feed
-  - jekyll-seo-tag
-  - jekyll-sitemap
-  
-lang: ko_KR
-
-
-# Exclude from processing.
-# The following items will not be processed, by default. Create a custom list
-# to override the default setting.
-# exclude:
-#   - Gemfile
-#   - Gemfile.lock
-#   - node_modules
-#   - vendor/bundle/
-#   - vendor/cache/
-#   - vendor/gems/
-#   - vendor/ruby/
+# Build Ssttings
+sass:
+  sass_dir: _sass
+  style: :compressed
+gems: [jekyll-paginate]
+bootstrap:
+  assets: true
