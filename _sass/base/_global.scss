@@ -4,7 +4,7 @@
 	box-sizing: border-box;
 }
 html, body{height:100%;}
-body{-webkit-tap-highlight-color:rgba(0,0,0,0)}
+body{-webkit-tap-highlight-color:rgba(0,0,0,0); word-break:break-all;}
 
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -107,8 +107,6 @@ a:link, a:visited, a:active, a:hover {
 .highlighter-rouge {
     font-size: 0.9rem;
     color: $theme-color;
-    background-color: $theme-bright;
-    padding: .1em .5em;
     border-radius: 3px;
 }
 .tag {
