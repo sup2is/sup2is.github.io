@@ -61,3 +61,5 @@ bootstrap:
   assets: true
   
 lang: ko_KR
+
+google_analytics: UA-80265650-1
