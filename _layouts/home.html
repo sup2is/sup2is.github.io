@@ -18,39 +18,41 @@ layout: default
     <!-- Post List -->
     <section id="posts" class="col-md-8">
       {% for post in paginator.posts %}
-      <div class="post">
-        <a href="{{ post.url | relative_url }}">
-          <div class="post-wrap">
-            <div class="text-warp">
-              <h3 class="title">{{ post.title }}</h3>
-              <p class="excerpt">
-                {% if post.excerpt.size > 50 %}
-                {{ post.excerpt | strip_html | strip_newlines | truncatewords: 25, '...' }}
-                {% else %}
-                {{ post.subtitle }}
-                {% endif %}
-              </p>
-              <div>
-                <span class="meta">
-                  {{ post.date | date: "%B %-d, %Y" }}
-                </span>
-                <ul class="tag-wrap">
-                  {% for tag in post.tags %}
-                  <a href="{{site.baseurl}}/tags#{{ tag | cgi_escape }}">
-                    <li class="tag-sm">{{ tag }}</li>
-                  </a>
-                  {% endfor %}
-                </ul>
+          {% if post.show != false %}
+              <div class="post">
+                <a href="{{ post.url | relative_url }}">
+                  <div class="post-wrap">
+                    <div class="text-warp">
+                      <h3 class="title">{{ post.title }}</h3>
+                      <p class="excerpt">
+                        {% if post.excerpt.size > 50 %}
+                        {{ post.excerpt | strip_html | strip_newlines | truncatewords: 25, '...' }}
+                        {% else %}
+                        {{ post.subtitle }}
+                        {% endif %}
+                      </p>
+                      <div>
+                        <span class="meta">
+                          {{ post.date | date: "%B %-d, %Y" }}
+                        </span>
+                        <ul class="tag-wrap">
+                          {% for tag in post.tags %}
+                          <a href="{{site.baseurl}}/tags#{{ tag | cgi_escape }}">
+                            <li class="tag-sm">{{ tag }}</li>
+                          </a>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                    </div>
+                    {% if post.image %}
+                    <div class="img-wrap">
+                      <img src="{{ post.image }}" alt="">
+                    </div>
+                    {% endif %}
+                  </div>
+                </a>
               </div>
-            </div>
-            {% if post.image %}
-            <div class="img-wrap">
-              <img src="{{ post.image }}" alt="">
-            </div>
-            {% endif %}
-          </div>
-        </a>
-      </div>
+          {% endif %}
       {% endfor %}
       <!-- Pagination -->
       {% if paginator.total_pages > 1 %}
