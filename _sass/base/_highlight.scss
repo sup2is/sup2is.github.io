@@ -5,6 +5,12 @@
     }
     border-radius: 3px;
     overflow-x: scroll;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.highlight pre::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera*/
 }
 
 // https://github.com/richleland/pygments-css
