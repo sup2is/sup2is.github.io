@@ -1,11 +1,10 @@
 ---
 
 layout: post
-title: "Apache Kafka 시작하기 #1"
+title: "Apache Kafka 시작하기"
 tags: [Apache Kafka]
-date: 2020-05-03
+date: 2020-05-29
 comments: true
-show: false
 ---
 
 
@@ -17,8 +16,6 @@ show: false
 
 
 ![apache kafka](https://kafka.apache.org/images/logo.png)
-
-출처 : https://kafka.apache.org/
 
 <br>
 
@@ -32,8 +29,6 @@ Apache Kafka는 **여러 대의 분산 서버에서 대량의 데이터를 처�
 
 ![apache kafka](https://kafka.apache.org/images/kafka_diagram.png)
 
-출처 : https://kafka.apache.org/
-
 # Kafka의 탄생목적
 
 LinkedIn에서 Kafka를 개발하기 이전에도 비슷한 느낌의 Message Queue들이 오픈소스로 존재했는데 대표적인 오픈소스중에 하나로 **Rabbit MQ** 또는 **Active MQ** 등을 뽑을 수 있다.
@@ -44,79 +39,68 @@ LinkedIn에서 Kafka를 개발하기 이전에도 비슷한 느낌의 Message Qu
 
 <br>
 
-이전 시스템들의 강력한 메시지 전달 보장, Scale Out, 메시지를 Disk에쓰는가? 아니면 Memory에 쓰는가? 등의 다양한 이유가 있지만 Kafka의 존재이유는 **매우 높은 처리량**에 있다.  전세계 사용자들의 로그데이터를 분산환경에서 적절하게 처리해야했기 때문에 이전시스템들보다 조금 더 좋은 성능의 아키텍쳐가 필요했던 것이다. 그렇다고 RabbitMQ나 ActiveMQ가 성능이 떨어지는 것은 절대 아니다.
-
-<br>
-
-![주석 2020-05-29 145728](https://user-images.githubusercontent.com/30790184/83240073-cdbb5880-a1d3-11ea-88e2-dcb37b22673e.png)
-
-<br>
+이전 시스템들의 강력한 메시지 전달 보장, Scale Out, 메시지를 Disk에쓰는가? 아니면 Memory에 쓰는가? 등의 다양한 이유가 있지만 Kafka의 존재이유는 **매우 높은 처리량**에 있다.  전세계 사용자들의 로그데이터를 분산환경에서 적절하게 처리해야했기 때문에 이전시스템들보다 조금 더 좋은 성능의 아키텍쳐가 필요했던 것이다.
 
 # LinkedIn의 Kafka 실현 목표
 
 LinkedIn은 다음과 같이 Kafka의 실현 목적을 정의했다.
 
 1. 높은 처리량으로 실시간 처리
-   - 전 세계 사용자들의 방대한 액세스 로그를 감당하기위해 매우 높은 처리량을 필요로 함
+   - 전 세계 사용자들의 방대한 액세스 로그를 감당하기위해 매우 높은 처리량을 필요로 한다.
 2. 임의의 시간에 데이터를 읽기
-   - 메시지를 단순히 실시간 처리 뿐만 아니라 임의의 시간에 읽어들일 수 있도록 메시지를 Memory에 저장하지 않고 Disk에 저장시키도록 함
+   - 메시지를 단순히 실시간 처리 뿐만 아니라 임의의 시간에 읽어들일 수 있도록 메시지를 Memory에 저장하지 않고 Disk에 저장시키도록 한다.
 3. 다양한 제품과 시스템에 쉽게 연동
-   - 이용 목적에 따라 DB, 데이터웨어하우스 등의 보다 쉬운 API를 제공해서 손쉬운 연결을 하도록 함
+   - 이용 목적에 따라 DB, 데이터웨어하우스 등의 보다 쉬운 API를 제공해서 손쉬운 연결을 하도록 한다.
 4. 메시지 손실방지
-   - Kafka 서버가 갑작스럽게 종료되더라도 Replication을 통해 메시지가 손실되는 것을 방지하도록 함
+   - Kafka 서버가 갑작스럽게 종료되더라도 Replication을 통해 메시지가 손실되는 것을 방지하도록 한다.
 
-# Queueing Model VS Pub/Sub Model
+# Kafka 기본 시스템 구성
 
-카프카는 Queueing Model과 Pub/Sub Model 모델을 동시에 구현하기위해 새로운 개념인 Consumer Group과 Partition이라는 개념을 만들었다. Consumer Group과 Partition 설명 이전에 Queueing Model과 Pub/Sub Model 에 대해서 간단하게 알아보자
+kafka를 사용하는 애플리케이션의 기본적인 구성은 다음과 같다.
 
-## Queueing Model
-
-![주석 2020-05-29 150430](https://user-images.githubusercontent.com/30790184/83240063-ca27d180-a1d3-11ea-8683-54f8f92fa9df.png)
-
-Queueing Model의 가장 핵심적인 부분은 **메시지의 소비를 하나의 컨슈머에게만 보장**한다는 점이다. 이 Queueing Model은 컨슈머의 개수대로 병렬처리를 할 수 있다는 특징이 있다.
-
-## Pub/Sub Model
-
-![주석 2020-05-29 150454](https://user-images.githubusercontent.com/30790184/83240068-cc8a2b80-a1d3-11ea-9a5b-f7e447420029.png)
+![](https://user-images.githubusercontent.com/30790184/83240069-cd22c200-a1d3-11ea-8684-413d4192c156.png)
 
 
 
-Pub/Sub Model의 가장 핵심적인 부분은 **동일한 topic을 구독하는 Subscriber는 서로 동일한 메시지를 받는다.** 이다.
+- **브로커:** 하나의 서버로 올라가고 이 브로커를 카프카 서버로 봐도 무방할 것 같다. 브로커들을 모아서 클러스터링을 구성하여 성능 확장을 할 수 있고 브로커에서 받은데이터는 전부 영속화가 이루어지기 때문에 장기 보관이 가능하다.
+- **메시지:** 카프카에서 다루는 데이터의 최소 단위이다.
+- **프로듀서:** 데이터를 생산하는 생산자이며 브로커에게 메시지를 보내는 애플리케이션을 가르킨다.
+- **컨슈머:** 브로커에게서 메시지를 소비하는 애플리케이션을 가르킨다.
+- **토픽:** 메시지를 종류별로 구분할 수 있는 스토리지개념, 토픽은 브로커에 배치되어서 관리되고 프로듀서는 이 토픽에 데이터를 전송하고 컨슈머는 이 토픽에서 데이터를 소비한다.
+- **주키퍼:** 카프카의 브로커에 있어서 분산 처리를 위한 관리 도구로 apache zookeeper를 사용한다. 때문에 카프카 서버를 구성하기 위해 현재로써는 주키퍼 서버가 필수로 구동되어야 한다.
 
 
 
-# Kafka의 Messaging Model
+# Kafka 분산 메시징 구성
 
-Kafka는 이 Queueing Model 과 Pub/Sub Model을 동시에 구현했다.
-
-![Kafka_Architecture](https://user-images.githubusercontent.com/30790184/83240069-cd22c200-a1d3-11ea-8684-413d4192c156.png)
-
-- Partition: Topic 하위의 개념으로 Topic 내부에 n개의 파티션 존재 가능함. Topic을 구성하는 Partition은 브로커 클러스터안에서 분산 배치되어 스케일 아웃이 가능함
-- Consumer Group: Topic을 구독하는 Consumer를 Group화 시켜서 Consumer Group을 통해 여러 Partition에서 메시지를 취득할 수 있도록 함
+- **파티션:** 토픽에 대한 대량의 메시지 입출력을 지원하기 위해서 브로커 내부에는 파티션이라는 개념을 도입했다. 하나의 토픽에는 여러개의 파티션을 구성할 수 있고 이 파티션은 카프카 클러스터 내부에서 분산되어 성능 확장 또한 가능하다. 이런 파티션은 컨슈머 그룹의 컨슈머 개수와 매칭되어 병렬 분산 처리를 가능하게 해준다.
+- **컨슈머 그룹:** 컨슈머를 그룹화시켜서 토픽내부의 파티션의 개수에 따라 병렬 분산 처리를 가능하게 해주는 개념이다.
+- **오프셋:** 각 파티션 단위로 메시지 위치를 나타내는 정보로 오프셋이라는 개념이 있다. 컨슈머가 메시지를 올바르게 소비했다면 오프셋 커밋을 해서 소비한 메시지의 범위와 실패시 재시도를 제어한다.
 
 
 
-하나의 파티션은 한개의 컨슈머에게 메시지를 전달할 수 있고 하나의 컨슈머는 1개 이상의 파티션에서 메시지를 소비할 수 있다.
+![](https://gerardnico.com/_media/dit/kafka/log_consumer.png?w=400&tok=00808d)
 
-![Kafka_Partition_Consumer](https://user-images.githubusercontent.com/30790184/83240072-cd22c200-a1d3-11ea-97d4-fe8b98fa667d.png)
+# Kafka의 복제 구조
 
-만약 파티션이 3개가있고 컨슈머가 3개가있다면 처리량의 3배가 되는 구조가 된다.
+앞서 설명한 카프카의 실현 목적에서 **메시지 손실방지**는 카프카 내부의 레플리카라는 개념으로 구현이 되었다.
 
-# Kafka의 메시지 전달
+![](https://static1.squarespace.com/static/56894e581c1210fead06f878/t/5b8bf33bcd8366d4a0159508/1535898444327/KafkaPartitions.PNG?format=1500w)
+
+파티션은 단일 또는 여러개의 레플리카로 구성되고 여러 레플리카 중 한개는 Leader이고 나머지는 Follower이다.
+
+Leader 레플리카의 복제 상태를 유지하고 있는 레플리카는 In-Sync Replica로 분류되고 보통 ISR로 줄여서 사용한다. 이 ISR들은 비동기로 계속적인 복제를 유지해서 메시지의 손실을 최소화 시켜준다.
+
+<br>
 
 
 
+<hr>
 
-
-
-
-포스팅은 여기까지 하겠습니다. 
-
-퍼가실때는 출처를 반드시 남겨주세요!
+포스팅은 여기까지 하겠습니다. 퍼가실때는 출처를 반드시 남겨주세요!
 
 <br>
 
 **References**
 
 -  실전 아파치 카프카 - 사사키 도루 등 6명 (한빛미디어)
--  https://dev.to/tbking/how-to-choose-between-kafka-and-rabbitmq-4jol
