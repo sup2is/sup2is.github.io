@@ -1,7 +1,7 @@
 // Definition of tag style in post
 #post{
     h1, h2, h3, h4, h5, h6{
-        margin : 20px 0 30px 0;
+        margin : 40px 0 40px 0;
     }
     ul {
         list-style-position: outside;
@@ -39,7 +39,6 @@
     img {
         max-width : 96%;
         margin: 2%;
-        box-shadow: 0 0px 6px 1px rgba(0,0,0,0.1);
         &.width-30{
             max-width: 30%;
             margin: 2% 35%;
