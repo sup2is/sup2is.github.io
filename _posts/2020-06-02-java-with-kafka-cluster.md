@@ -64,8 +64,8 @@ docker run -d \
 
 차례대로 kafka1, kafka2, kafka3 서버를 띄웠고 환경설정을 간단하게 설명하면
 
-- KAFKA_ADVERTISED_LISTENERS : 외부에서 Kafka 서버로 들어오는 IP를 지정할 수 있다. 이 값을 통해 Consumer와 Producer가 Kafka와 연결된다.
-- KAFKA_LISTENERS : 내부에서 매핑될 IP를 지정할 수 있다.
+- **KAFKA_ADVERTISED_LISTENERS :** 외부에서 Kafka 서버로 들어오는 IP를 지정할 수 있다. 이 값을 통해 Consumer와 Producer가 Kafka와 연결된다.
+- **KAFKA_LISTENERS :** 내부에서 매핑될 IP를 지정할 수 있다.
 
 KAFKA_ADVERTISED_LISTENERS 와 KAFKA_LISTENERS 에 대한 설명은 아래 링크에서 조금 더 자세한 설명을 확인할 수 있다. 
 
@@ -412,7 +412,7 @@ java -cp ./consumer-1.0-SNAPSHOT-jar-with-dependencies.jar me.sup2is.consumer.My
 <hr>
 포스팅은 여기까지 하겠습니다. 퍼가실때는 출처를 반드시 남겨주세요!
 
-예제 : [https://github.com/sup2is/java-example/tree/master/kafka-example](https://github.com/sup2is/java-example/tree/master/kafka-example)
+예제 : [https://github.com/sup2is/kafka-example/tree/master/kafka-with-java](https://github.com/sup2is/kafka-example/tree/master/kafka-with-java)
 
 <br>
 
