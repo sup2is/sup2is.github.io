@@ -23,9 +23,9 @@ comments: true
 
 # Kafka 3대로 Cluster 구성하기
 
-카프카 서버를 띄우는건 입맛에 맞춰서 진행하면 된다. 나같은 경우는 CentOS7에 도커 컨테이너로 카프카3대를 준비했다. 만약 카프카가 설치되지 않았다면 https://kafka.apache.org/downloads 에서 다운로드 할 수 있다.
+카프카 서버를 띄우는건 입맛에 맞춰서 진행하면 된다. 나같은 경우는 CentOS7에 도커 컨테이너로 카프카3대를 준비했다. 만약 카프카가 설치되지 않았다면 [https://kafka.apache.org/downloads](https://kafka.apache.org/downloads) 에서 다운로드 할 수 있다.
 
-이제 kafka server를 준비해보자. 현재 도커 컴포즈 사용이 어려운 환경이라 단순히 도커 커맨드로 컨테이너를 준비했고 만약 도커 컴포즈를 사용하고 싶다면 https://github.com/simplesteph/kafka-stack-docker-compose 에서 compose.yml 파일을 사용하면 될 듯 하다. 
+이제 kafka server를 준비해보자. 현재 도커 컴포즈 사용이 어려운 환경이라 단순히 도커 커맨드로 컨테이너를 준비했고 만약 도커 컴포즈를 사용하고 싶다면 [https://github.com/simplesteph/kafka-stack-docker-compose](https://github.com/simplesteph/kafka-stack-docker-compose) 에서 compose.yml 파일을 사용하면 될 듯 하다. 
 
 먼저 zookeeper server를 준비한다
 
@@ -69,7 +69,7 @@ docker run -d \
 
 KAFKA_ADVERTISED_LISTENERS 와 KAFKA_LISTENERS 에 대한 설명은 아래 링크에서 조금 더 자세한 설명을 확인할 수 있다. 
 
-https://medium.com/@iamsuraj/what-is-advertised-listeners-in-kafka-72e6fae7d68e
+[https://medium.com/@iamsuraj/what-is-advertised-listeners-in-kafka-72e6fae7d68e](https://medium.com/@iamsuraj/what-is-advertised-listeners-in-kafka-72e6fae7d68e)
 
 <br>
 
@@ -412,7 +412,7 @@ java -cp ./consumer-1.0-SNAPSHOT-jar-with-dependencies.jar me.sup2is.consumer.My
 <hr>
 포스팅은 여기까지 하겠습니다. 퍼가실때는 출처를 반드시 남겨주세요!
 
-예제 : https://github.com/sup2is/java-example/tree/master/kafka-example
+예제 : [https://github.com/sup2is/java-example/tree/master/kafka-example](https://github.com/sup2is/java-example/tree/master/kafka-example)
 
 <br>
 
