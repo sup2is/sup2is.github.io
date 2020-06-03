@@ -3,7 +3,7 @@
 layout: post
 title: "Kafka Cluster 구성하고 Spring Boot에서 Kafka 사용하기"
 tags: [Spring Boot, Apache Kafka]
-date: 2020-06-02
+date: 2020-06-03
 comments: true
 ---
 
@@ -31,7 +31,7 @@ comments: true
 
 # Kafka 3대로 Cluster 구성하기
 
-나는 도커 컨테이너 기반으로 Kafka server를 3대 구성했다. 이전 글에서 컨테이너를 올리고 확인하는 부분까지 작성했으니 클러스터 구성이 필요한 분이면 [Kafka Cluster 구성하고 Java에서 Kafka 사용하기](http://127.0.0.1:4000/2020/06/02/java-with-kafka-cluster.html)를 참고하자
+나는 도커 컨테이너 기반으로 Kafka server를 3대 구성했다. 이전 글에서 컨테이너를 올리고 확인하는 부분까지 작성했으니 클러스터 구성이 필요한 분이면 [Kafka Cluster 구성하고 Java에서 Kafka 사용하기](https://sup2is.github.io/2020/06/02/java-with-kafka-cluster.html)를 참고하자
 
 카프카에 토픽을 먼저 생성해도 되지만 이번에는 Spring Kafka 프로젝트에서 제공하는 **KafkaAdmin**를 사용해서 토픽을 생성해보도록 하겠다. 
 
