@@ -19,7 +19,7 @@ comments: true
 
 초기에 LinkedIn의 카프카 요구사항중에 하나로 **다양한 제품과 시스템에 쉽게 연동** 이라는 내용이 있었다. 결론부터 말하면 Kafka Connect가 이걸 가능하게 해준다. database 또는 key-value store, aws S3 등등 의 매우매우 다양한 커넥터가 존재하고 필요에 맞게 알아서 사용하면 된다.
 
-![](https://cdn.confluent.io/wp-content/uploads/Kafka_connect.jpg)
+![Dy6Fr](https://user-images.githubusercontent.com/30790184/83999437-b3386a80-a99d-11ea-99d7-aea038f6256f.png)
 
 카프카 커넥트는 프로듀서와 컨슈머 사이에 배치될 수 있는데 위에 그림처럼 JDBC 를 사용해서 Database와  Kafka를 연결시킬 수 있고 Elasticsearch 또는 FlatFile 형식으로도 연결시킬 수 있다.
 
