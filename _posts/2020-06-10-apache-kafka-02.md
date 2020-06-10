@@ -13,7 +13,7 @@ comments: true
 
 # OverView
 
-이번시간에는 내 멋대로 한번 카프카를 조금 더 쉽게 이해할 수 있도록 하기 위해서 docker-compose로 카프카 클러스터를 구성하고 replicas, partitions, consumer-group에 대해서 간단한 예제와 함께 설명하는 시간을 갖도록 하겠다.
+이번시간에는 카프카 command line tools의 사용법에 대한 몇가지 정리와 카프카를 조금 더 쉽게 이해하기 위한 포스팅을 작성해봤다. 예제는 docker-compose를 사용해서 카프카 클러스터를 구성하고 consumer-group, partitions, replicas 에 대해서 간단하게 알아보도록 하겠다.
 
 # 시작하기전에
 
@@ -24,12 +24,16 @@ comments: true
 
 예제는 docker 컨테이너로 카프카3대와 주키퍼 서버1대를 올릴 것이다. docker-compose를 사용한다.
 
-kafka에서 제공하는 .sh 파일을 사용하기 위해서 kafka 관련 파일들을 다운받으려면 아래에서 다운 받을 수 있다
+kafka에서 제공하는 command line tools를 사용해야한다. 파일들은 아래를 참고해서 다운 받을 수 있다
 
 - apache kafka : [https://kafka.apache.org/](https://kafka.apache.org/)
 - confluent kafka : [https://www.confluent.io/](https://www.confluent.io/)
 
-confluent kafka가 조금더 많은 기능을 내장하고 있다. community 버전 이외에도 commercial버전도 제공하고 있다. 참고로 confluent는 linkedin에서 최초에 kafka를 만든 사람들이 따로 나와서 설립한 회사이다.
+apache kafka와 confluent kafka가 있는데 confluent kafka가 조금더 많은 기능을 내장하고 있다. 자세한내용은 [https://www.quora.com/What-is-the-difference-between-Apache-Kafka-and-Confluent-Kafka](https://www.quora.com/What-is-the-difference-between-Apache-Kafka-and-Confluent-Kafka) 에서 찾아 볼 수 있다.
+
+간략하게 confleunt kafka와 apache kafka는 동일한 소프트웨어이고 confluent kafka는 오픈소스인 kafka community 버전 이외에 commercial버전도 제공하고 있다.
+
+참고로 confluent 라는 회사는 linkedin에서 최초에 kafka를 만든 사람들이 따로 나와서 설립한 회사이다.
 
 나는 이 예제에선 apache kafka를 사용한다.
 
@@ -38,6 +42,8 @@ confluent kafka가 조금더 많은 기능을 내장하고 있다. community 버
 docker-compose를 직접 작성하지 않아도 누군가 만들어 놓은 compose 파일들이 있다. 나는 [https://github.com/simplesteph/kafka-stack-docker-compose](https://github.com/simplesteph/kafka-stack-docker-compose)에 있는 **zk-single-kafka-multiple.yml** 을 사용한다.
 
 카프카 서버 3대와 주키퍼 서버 1대의 구성으로 클러스터를 구성한다.
+
+**zk-single-kafka-multiple.yml**
 
 ```
 version: '2.1'
@@ -116,7 +122,7 @@ export DOCKER_HOST_IP=127.0.0.1
 docker-compose -f zk-single-kafka-multiple.yml up
 ```
 
-docker-compose로 컨테이너들이 잘 구성되었다면 kafka home 디렉토리에서 다음 명령어를 입력해보자.
+docker-compose로 컨테이너들이 잘 구성되었다면 docker ps -a로 컨테이너들이 잘 동작중인지 확인하고 문제가 없다면 kafka home 디렉토리에서 다음 명령어를 입력해보자.
 
 ```
 ./bin/zookeeper-shell.sh localhost:2181 ls /brokers/ids
@@ -147,7 +153,15 @@ docker-compose로 컨테이너들이 잘 구성되었다면 kafka home 디렉토
     --zookeeper  localhost:2181
 ```
 
---replication-factor와 --partitions는 아래에서 설명한다.
+- **--create: **토픽을 생성하는 옵션이다.
+- **--topic:** 토픽의 이름을 지정하는 옵션이다.
+- **--zookeeper:** zookeeper server를 지정하는 옵션이다.
+- **--replication-factor:** replicas의 개수를 지정하는 옵션이다. 이 옵션은 클러스터 내부 broker의 개수보다 높으면 안된다. 우리는 초기에 3개의 브로커를 생성한 클러스터를 구성했으므로 3개가 맥시멈이다.
+- **--partitions: ** partition의 개수를 지정하는 옵션이다.
+
+
+
+
 
 ## 토픽 확인하기
 
@@ -158,11 +172,11 @@ docker-compose로 컨테이너들이 잘 구성되었다면 kafka home 디렉토
 [__confluent.support.metrics, __consumer_offsets, my-test-topic]
 ```
 
-__이 붙은 토픽들은 카프카가 사용하는 토픽이라고 생각하면 된다. my-test-topic이 잘 생성된 것을 확인할 수 있다.
+__이 붙은 토픽들은 카프카가 사용하는 토픽이라고 생각하면 된다. 우리가 위에서 생성한 'my-test-topic'이 잘 생성된 것을 확인할 수 있다.
 
 # Replication-factor  이해하기
 
-카프카는 메시지를 중계함과 동시에 서버가 고장 났을때 수신한 메시지를 잃지 않기 위해서 **복제구조**를 갖추고 있다. 파티션은 단일 또는 여러개의 레플리카로 구성되고 여러 레플리카 중 최소 한개는 Leader, 나머지는 Follower가 된다. 
+카프카는 메시지를 중계함과 동시에 서버가 고장 났을때 수신한 메시지를 잃지 않기 위해서 **복제구조**를 갖추고 있다. 파티션은 단일 또는 여러개의 레플리카로 구성되고 여러 레플리카 중 최소 한개는 **Leader**, 나머지는 **Follower**가 된다. 
 
 ```
 ./bin/kafka-topics.sh --create \
@@ -214,44 +228,43 @@ __이 붙은 토픽들은 카프카가 사용하는 토픽이라고 생각하면
 
 ![20200610_112155](https://user-images.githubusercontent.com/30790184/84219989-bd2cab80-ab0c-11ea-94e9-58d7c317d2e0.png)
 
-
+브로커서버 1에있던 Follower 들이 partition 1과 2의 ISR이였으므로 브로커서버 1에 있는 파티션이 전부 Leader가 되었다.
 
 만약 다시 브로커 서버 2와 3을 올린다고 하더라도 Leader는 변경되지 않는다.
 
 # 카프카의 kafka-console-consumer, kafka-console-producer 사용해보기
 
+카프카는 간편하게 테스트해볼 수 있게 producer와 consumer를 console 형태로 제공한다. 쉘을 두개 이상 준비해서 진행해야한다.
+
+## kafka-console-consumer
+
+먼저 consumer console을 실행시켜보자
+
+```
+./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092,localhost:9093,localhost:9094 --topic my-test-topic
+```
+
+**--broker-list** 에 카프카 서버들의 주소를 입력하고 **--topic** 옵션으로 우리가 방금 생성한 토픽의 이름을 넣어준다.
+
 ## kafka-console-producer 
 
-카프카는 간편하게 테스트해볼 수 있게 producer와 consumer를 console 형태로 제공한다. 아래의 명령어로 producer를 실행시켜 보자.
+아래의 명령어로 producer를 실행시켜 보자.
 
 ```
 ./bin/kafka-console-producer.sh --broker-list localhost:9092,localhost:9093,localhost:9094 --topic my-test-topic
 ```
 
-**--broker-list** 에 카프카 서버들의 주소를 입력하고 --topic 옵션으로 방금 생성한 토픽의 이름을 넣어준다.
+마찬가지로 **--broker-list --topic** 옵션을 알맞게 넣어준다.
 
-쉘이 활성화되면 텍스트를 몇개 입력을 해보자. 아직 컨슈머가 없더라도 괜찮다.
-
-카프카는 메시지를 디스크에 영속시키는 특징이 있다. 따라서 현재 컨슈머가 없더라도 offset 이라는 정보를 통해서 이 메시지를 소비했는지 아닌지를 판별한 뒤에 소비하지 않은 메시지라면 컨슈머를 통해서 메시지를 소비하게 한다. 
-
-## kafka-console-consumer
-
-이제 consumer console을 실행시켜보자
-
-```
-./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092,localhost:9093,localhost:9094 --topic my-test-topic 
-```
-
-아까 producer에서 보냈던 메시지들이 입력된 것을 확인할 수 있다.
+producer가 켜진 쉘에서 텍스트를 입력하면 consumer쪽 쉘에 producer가 보낸 메시지들이 출력되는 것을 확인할 수 있다.
 
 # 카프카의 consumer group과 partitions이해하기
 
 카프카는 consumer group과 partitions라는 개념을 통해서 분산처리 모델을 구현했다. 간단하게 설명하면 **같은 consumer group을 가진 컨슈머 그룹이 같은 토픽을 구독하고있다면 메시지를 하나의 컨슈머에게만 소비**하게 한다. 먼저 컨슈머 그룹 없이 my-test-topic을 구독하고 있을때를 보자.
 
-
 ## Consumer Group이 없을때
 
-producer쪽에서 메시지를 입력했을때 아래와 같이 구독하고 있는 모든 컨슈머에 메시지가 출력되는 것을 확인할 수 있다.
+왼쪽은 producer이고 오른쪽의 쉘3개는 consumer들이다. 현재는 consumer-group이 지정되지 않았기때문에 producer쪽에서 메시지를 입력했을때 아래와 같이 구독하고 있는 모든 컨슈머에 메시지가 출력되는 것을 확인할 수 있다. 
 
 
 
@@ -261,13 +274,13 @@ producer쪽에서 메시지를 입력했을때 아래와 같이 구독하고 있
 
 ## Consumer Group이 있을때
 
-아래 명령어로 컨슈머 그룹을 my-group으로 할당시켜보자.
+컨슈머들을 모두 종료하고 아래 명령어로 컨슈머 그룹을 my-group으로 할당시켜보자.
 
 ```
-./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092,localhost:9093,localhost:9094 --topic my-test-topic --from-beginning --consumer-property group.id=my-group
+./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092,localhost:9093,localhost:9094 --topic my-test-topic --consumer-property group.id=my-group
 ```
 
-**--consumer-property group.id=my-group** 을 통해서 my-group이라는 컨슈머그룹을 할당했다. 이제 producer 쪽에서 메시지를 여러개 보내보면 메시지가 Consumer Group이 없을때와는 다르게 하나의 컨슈머에게만 메시지를 전달하는 것을 확인할 수 있다.
+**--consumer-property group.id=my-group** 을 통해서 my-group이라는 컨슈머그룹을 할당했다. 이제 producer 쪽에서 메시지를 여러개 보내보면 메시지가 Consumer Group이 없을때와는 다르게 **하나의 컨슈머에게만 메시지를 전달**하는 것을 확인할 수 있다.
 
 
 
@@ -293,7 +306,7 @@ producer쪽에서 메시지를 입력했을때 아래와 같이 구독하고 있
 마지막으로 kafka-consumer-groups.sh 을 사용해서 현재 파티션에 대한 상세정보들을 확인할 수 있다. 아래명령어를 입력해보자.
 
 ```
-./bin/kafka-consumer-groups.sh --describe --group my-test-topic --bootstrap-server localhost:9092,localhost:9093,localhost:9094
+./bin/kafka-consumer-groups.sh --describe --group my-group --bootstrap-server localhost:9092,localhost:9093,localhost:9094
 ```
 
 현재는 모든 파티션에 컨슈머들이 연결되어있기때문에 아래와 같은 그림이 나온다.
@@ -306,11 +319,13 @@ producer쪽에서 메시지를 입력했을때 아래와 같이 구독하고 있
 
 이전과 비교했을때 **consumer-id**가 하나로 통일된 것을 확인할 수 있다.
 
-
-
 마지막으로 모든 consumer 쉘을 모두 종료시킨 뒤 producer에 어느정도의 메시지를 보내고 한번 더 확인하면 아래와 같이 LAG 목록에 축적된 메시지의 개수가 나온다. **CURRNT-OFFSET + LAG = LOG-END-OFFSET**이 된다.
 
 ![20200610_114122](https://user-images.githubusercontent.com/30790184/84221202-a5a2f200-ab0f-11ea-89f2-c4232f0b3a72.png)
+
+카프카는 메시지를 디스크에 영속시키는 특징이 있다. 따라서 현재 컨슈머가 없더라도 offset 이라는 정보를 통해서 이 메시지를 소비했는지 아닌지를 판별한 뒤에 소비하지 않은 메시지라면 컨슈머를 통해서 메시지를 소비하게 한다. 
+
+다시 console-consumer쪽을 올리면 소비하지 못했던 메시지들이 console-consumer쪽으로 출력될 것이다.
 
 # 마무리
 
