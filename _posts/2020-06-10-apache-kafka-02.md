@@ -137,7 +137,7 @@ docker-compose로 컨테이너들이 잘 구성되었다면 kafka home 디렉토
 
 ## 토픽 만들기
 
-가장먼저 해볼일은 카프카에 토픽을 생성하는 것이다. 아래 명령으로 토픽을 생성해보자
+가장먼저 해볼일은 카프카에 토픽을 생성하는 것이다. 아래 명령어로 토픽을 생성해보자
 
 ```
 ./bin/kafka-topics.sh --create \
@@ -293,7 +293,7 @@ producer쪽에서 메시지를 입력했을때 아래와 같이 구독하고 있
 마지막으로 kafka-consumer-groups.sh 을 사용해서 현재 파티션에 대한 상세정보들을 확인할 수 있다. 아래명령어를 입력해보자.
 
 ```
-./bin/kafka-consumer-groups.sh --describe --group my-push-topic --bootstrap-server localhost:9092,localhost:9093,localhost:9094
+./bin/kafka-consumer-groups.sh --describe --group my-test-topic --bootstrap-server localhost:9092,localhost:9093,localhost:9094
 ```
 
 현재는 모든 파티션에 컨슈머들이 연결되어있기때문에 아래와 같은 그림이 나온다.
@@ -308,9 +308,15 @@ producer쪽에서 메시지를 입력했을때 아래와 같이 구독하고 있
 
 
 
-마지막으로 모든 consumer 쉘을 모두 종료시킨 뒤 producer에 어느정도의 메시지를 보내고 한번 더 확인하면 아래와 같이 LAG 목록에 축적된 메시지의 개수가 나온다. CURRNT-OFFSET + LAG = LOG-END-OFFSET이 된다.
+마지막으로 모든 consumer 쉘을 모두 종료시킨 뒤 producer에 어느정도의 메시지를 보내고 한번 더 확인하면 아래와 같이 LAG 목록에 축적된 메시지의 개수가 나온다. **CURRNT-OFFSET + LAG = LOG-END-OFFSET**이 된다.
 
 ![20200610_114122](https://user-images.githubusercontent.com/30790184/84221202-a5a2f200-ab0f-11ea-89f2-c4232f0b3a72.png)
+
+# 마무리
+
+카프카를 공부하면서 사용했던 스크립트들을 간략하게 정리해볼겸 간단하게 정리해봤다. 이 글도 누군가에게 도움이 됐으면 좋겠다.
+
+
 
 <hr>
 포스팅은 여기까지 하겠습니다. 퍼가실때는 출처를 반드시 남겨주세요!
