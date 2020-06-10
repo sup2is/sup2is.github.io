@@ -24,7 +24,7 @@ comments: true
 간단하게 추가 설명하면
 
 1. 카프카는 프로듀서와 컨슈머의 브로커 역할을 한다.
-2. 프로듀서는 Rest API로 Client에게서 푸시알람 이벤트를 호출하는 endpoint를 제공한다.
+2. 프로듀서는 Rest API로 Client에게서 푸시알람 이벤트를 호출하는 endpoint를 제공하고 푸시 알람데이터를 카프카로 전달한다.
 3. 컨슈머는 카프카에게서 받은 데이터를 푸시서버에 전송하는 역할을 한다.
 
 위에서 짜놓은 시나리오를 기반으로 간단하게 어플리케이션을 구성해보자!
@@ -131,7 +131,7 @@ kafka.my.push.topic.name=app-push-topic
 
 설정이 모두 끝났다면 KafkaAdmin을 사용해서 Topic을 생성하기 위한 KafkaTopicConfig 클래스를 생성해보자
 
-## Spring Kafka 로 Topic 생성하기
+## Spring KafkaAdmin으로 Topic 생성하기
 
 Spring for Apache Kafka는 KafkaAdmin을 사용해서 토픽을 생성할 수 있게 해준다. 사용법은 아래와 같다
 
@@ -334,7 +334,7 @@ public class GCMPushRestController {
 
 ```
 
-그냥 단순히 "/push" 로 요청이 넘어왔을때 카프카에 넘어온 gcmPushEntity를 보내도록 구성했다.
+ "/push" 로 요청이 넘어왔을때 **@RequestBody GCMPushEntity gcmPushEntity**를 카프카 클러스터에 보내도록 구성했다.
 
 <br>
 
@@ -522,7 +522,7 @@ public class KafkaConsumerConfig {
 }
 ```
 
-주목할만한 부분은 클래스 상단에 **@EnableKafka** 를 붙인것과 consumerFactoryConfig() 메서드에서 Deserializer들을 Producer와 일치하도록 구성한 것이다. 근데 여기에서는 JsonDeserializer 객체를 직접 생성해서 등록했는데 그 이유는 Producer의 GCMPushEntity의 패키지명과 Consumer의 GCMPushEntity 패키지명이 달랐기 때문이다. 만약 package명이 다르다면 다른 객체로 판단하기때문에 **deserializer.addTrustedPackages("*");** 메서드로 해당 패키지를 신뢰할 수 있도록 추가해줘야한다. 이것때문에 고생좀 했다.
+주목할만한 부분은 클래스 상단에 **@EnableKafka** 를 붙인것과 consumerFactoryConfig() 메서드에서 **Deserializer들을 Producer와 일치하도록 구성**한 것이다. 근데 여기에서는 JsonDeserializer 객체를 직접 생성해서 등록했는데 그 이유는 Producer의 GCMPushEntity의 패키지명과 Consumer의 GCMPushEntity 패키지명이 달랐기 때문이다. 만약 package명이 다르다면 다른 객체로 판단하기때문에 **deserializer.addTrustedPackages("*");** 메서드로 해당 패키지를 신뢰할 수 있도록 추가해줘야한다. ~~이것때문에 고생좀 했다.~~
 
 <br>
 
