@@ -1,7 +1,7 @@
 ---
 
 layout: post
-title: "Kafka 조금 더 쉽게 이해하기"
+title: "Kafka Command Line Tools 사용하기"
 tags: [Apache Kafka]
 date: 2020-06-10
 comments: true
@@ -153,11 +153,11 @@ docker-compose로 컨테이너들이 잘 구성되었다면 docker ps -a로 컨�
     --zookeeper  localhost:2181
 ```
 
-- **--create: **토픽을 생성하는 옵션이다.
+- **--create:**토픽을 생성하는 옵션이다.
 - **--topic:** 토픽의 이름을 지정하는 옵션이다.
 - **--zookeeper:** zookeeper server를 지정하는 옵션이다.
 - **--replication-factor:** replicas의 개수를 지정하는 옵션이다. 이 옵션은 클러스터 내부 broker의 개수보다 높으면 안된다. 우리는 초기에 3개의 브로커를 생성한 클러스터를 구성했으므로 3개가 맥시멈이다.
-- **--partitions: ** partition의 개수를 지정하는 옵션이다.
+- **--partitions:** partition의 개수를 지정하는 옵션이다.
 
 
 
