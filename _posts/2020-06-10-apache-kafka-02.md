@@ -21,10 +21,11 @@ comments: true
 
 - docker
 - docker-compose
+- kafka command line tools
 
 예제는 docker 컨테이너로 카프카3대와 주키퍼 서버1대를 올릴 것이다. docker-compose를 사용한다.
 
-kafka에서 제공하는 command line tools를 사용해야한다. 파일들은 아래를 참고해서 다운 받을 수 있다
+그리고 kafka에서 제공하는 command line tools를 사용해야한다. 파일들은 아래를 참고해서 다운 받을 수 있다
 
 - apache kafka : [https://kafka.apache.org/](https://kafka.apache.org/)
 - confluent kafka : [https://www.confluent.io/](https://www.confluent.io/)
@@ -122,7 +123,13 @@ export DOCKER_HOST_IP=127.0.0.1
 docker-compose -f zk-single-kafka-multiple.yml up
 ```
 
-docker-compose로 컨테이너들이 잘 구성되었다면 docker ps -a로 컨테이너들이 잘 동작중인지 확인하고 문제가 없다면 kafka home 디렉토리에서 다음 명령어를 입력해보자.
+docker-compose로 컨테이너들이 잘 구성되었다면 docker ps -a로 컨테이너들이 잘 동작중인지 확인해보자.
+
+
+
+kafka command line tools는 **{kafkahome}/bin** 디렉토리에 위치하고 있다.
+
+컨테이너들을 확인하고 문제가 없다면 kafka home 디렉토리에서 다음 명령어를 입력해보자.
 
 ```
 ./bin/zookeeper-shell.sh localhost:2181 ls /brokers/ids
@@ -153,11 +160,11 @@ docker-compose로 컨테이너들이 잘 구성되었다면 docker ps -a로 컨�
     --zookeeper  localhost:2181
 ```
 
-- **--create:**토픽을 생성하는 옵션이다.
-- **--topic:** 토픽의 이름을 지정하는 옵션이다.
-- **--zookeeper:** zookeeper server를 지정하는 옵션이다.
-- **--replication-factor:** replicas의 개수를 지정하는 옵션이다. 이 옵션은 클러스터 내부 broker의 개수보다 높으면 안된다. 우리는 초기에 3개의 브로커를 생성한 클러스터를 구성했으므로 3개가 맥시멈이다.
-- **--partitions:** partition의 개수를 지정하는 옵션이다.
+- **\--create:**토픽을 생성하는 옵션이다.
+- **\--topic:** 토픽의 이름을 지정하는 옵션이다.
+- **\--zookeeper:** zookeeper server를 지정하는 옵션이다.
+- **\--replication-factor:** replicas의 개수를 지정하는 옵션이다. 이 옵션은 클러스터 내부 broker의 개수보다 높으면 안된다. 우리는 초기에 3개의 브로커를 생성한 클러스터를 구성했으므로 3개가 맥시멈이다.
+- **\--partitions:** partition의 개수를 지정하는 옵션이다.
 
 
 
@@ -244,7 +251,7 @@ __이 붙은 토픽들은 카프카가 사용하는 토픽이라고 생각하면
 ./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092,localhost:9093,localhost:9094 --topic my-test-topic
 ```
 
-**--broker-list** 에 카프카 서버들의 주소를 입력하고 **--topic** 옵션으로 우리가 방금 생성한 토픽의 이름을 넣어준다.
+**\--bootstrap-server** 에 카프카 서버들의 주소를 입력하고 **--topic** 옵션으로 우리가 방금 생성한 토픽의 이름을 넣어준다.
 
 ## kafka-console-producer 
 
@@ -254,7 +261,7 @@ __이 붙은 토픽들은 카프카가 사용하는 토픽이라고 생각하면
 ./bin/kafka-console-producer.sh --broker-list localhost:9092,localhost:9093,localhost:9094 --topic my-test-topic
 ```
 
-마찬가지로 **--broker-list --topic** 옵션을 알맞게 넣어준다.
+마찬가지로 **\--broker-list --topic** 옵션을 알맞게 넣어준다.
 
 producer가 켜진 쉘에서 텍스트를 입력하면 consumer쪽 쉘에 producer가 보낸 메시지들이 출력되는 것을 확인할 수 있다.
 
@@ -280,7 +287,7 @@ producer가 켜진 쉘에서 텍스트를 입력하면 consumer쪽 쉘에 produc
 ./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092,localhost:9093,localhost:9094 --topic my-test-topic --consumer-property group.id=my-group
 ```
 
-**--consumer-property group.id=my-group** 을 통해서 my-group이라는 컨슈머그룹을 할당했다. 이제 producer 쪽에서 메시지를 여러개 보내보면 메시지가 Consumer Group이 없을때와는 다르게 **하나의 컨슈머에게만 메시지를 전달**하는 것을 확인할 수 있다.
+**\--consumer-property group.id=my-group** 을 통해서 my-group이라는 컨슈머그룹을 할당했다. 이제 producer 쪽에서 메시지를 여러개 보내보면 메시지가 Consumer Group이 없을때와는 다르게 **하나의 컨슈머에게만 메시지를 전달**하는 것을 확인할 수 있다.
 
 
 
@@ -319,7 +326,7 @@ producer가 켜진 쉘에서 텍스트를 입력하면 consumer쪽 쉘에 produc
 
 이전과 비교했을때 **consumer-id**가 하나로 통일된 것을 확인할 수 있다.
 
-마지막으로 모든 consumer 쉘을 모두 종료시킨 뒤 producer에 어느정도의 메시지를 보내고 한번 더 확인하면 아래와 같이 LAG 목록에 축적된 메시지의 개수가 나온다. **CURRNT-OFFSET + LAG = LOG-END-OFFSET**이 된다.
+마지막으로 모든 consumer 쉘을 모두 종료시킨 뒤 producer에 어느정도의 메시지를 보내고 한번 더 확인하면 아래와 같이 LAG 목록에 축적된 메시지의 개수가 나온다.
 
 ![20200610_114122](https://user-images.githubusercontent.com/30790184/84221202-a5a2f200-ab0f-11ea-89f2-c4232f0b3a72.png)
 
