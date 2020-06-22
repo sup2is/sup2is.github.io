@@ -31,9 +31,7 @@ comments: true
 
 이 공장에서는 현대자동차의 아반떼와 소나타를 생산하는 공장이라고 가정한다. UML을 보면 도움이 될 수 있다.
 
-![20200622_160614](https://user-images.githubusercontent.com/30790184/85258359-557a4700-b4a2-11ea-81d1-74b4a25201ce.png)
-
-
+![20200622_164211](https://user-images.githubusercontent.com/30790184/85261625-61b4d300-b4a7-11ea-809d-aa9e8bb13c7b.png)
 
 ## 부품 만들기
 
