@@ -19,6 +19,10 @@ comments: true
 
 # 팩토리 메서드(Factory Method) 패턴
 
+
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Factory_Method_UML_class_diagram.svg/800px-Factory_Method_UML_class_diagram.svg.png)
+
 팩토리 메서드 패턴은 **객체를 생성하기 위해 인터페이스를 정의하지만 어떤 클래스의 인스턴스를 생성할 지에 대한 결정은 서브클래스가 내리도록 할 때** 유용하게 사용된다. 어떤 클래스가 자신이 생성해야 하는 객체의 클래스를 예측할 수 없을때 사용한다.
 
 나의 부족한 지식으로 이해한 팩토리 메서드 패턴의 구현은 두가지로 구성되는데 일반적으로 많이 사용하는(?) 것 같은 **매개변수화 된 팩토리 메서드 패턴**과 **abstract 클래스를 사용한 팩토리 메서드 패턴**이다. 일단 매개변수화된 팩토리 메서드 패턴은 아래와 같다
@@ -44,11 +48,7 @@ Something 타입의 구체클래스들의 생성을 SomeFactory에게 위임한 
 
 # 현대 자동차 생산 공장 예제
 
-이 공장에서는 현대자동차의 아반떼와 소나타를 생산하는 공장이라고 가정한다. UML을 보면 도움이 될 수 있다.
-
-![20200622_164211](https://user-images.githubusercontent.com/30790184/85261625-61b4d300-b4a7-11ea-809d-aa9e8bb13c7b.png)
-
-
+이 공장에서는 현대자동차의 아반떼와 소나타를 생산하는 공장이라고 가정한다. 
 
 ## 부품 만들기
 
