@@ -2,7 +2,7 @@
 
 layout: post
 title: "팩토리 메서드(Factory Method) 패턴 Feat.Java"
-tags: [Java, Design Pattern, Factory Method Pattern]
+tags: [Java, Design Pattern, Factory Method Pattern, Creation Pattern]
 date: 2020-06-23
 comments: true
 ---

@@ -2,7 +2,7 @@
 
 layout: post
 title: "추상 팩토리(Abstract Factory) 패턴 Feat.Java"
-tags: [Java, Design Pattern, Abstract Factory]
+tags: [Java, Design Pattern, Abstract Factory, Creation Pattern]
 date: 2020-06-22
 comments: true
 ---
