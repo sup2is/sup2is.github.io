@@ -195,7 +195,7 @@ public class Main {
 <hr>
 포스팅은 여기까지 하겠습니다. 퍼가실때는 출처를 반드시 남겨주세요!
 
-예제: [https://github.com/sup2is/study/tree/master/design-pattern/adapter-pattern](https://github.com/sup2is/study/tree/master/design-pattern/prototype-patternhttps://github.com/sup2is/study/tree/master/design-pattern/prototype-pattern)
+예제: [https://github.com/sup2is/study/tree/master/design-pattern/adapter-pattern](https://github.com/sup2is/study/tree/master/design-pattern/adapter-pattern)
 
 <br>
 
