@@ -198,4 +198,5 @@ Exception in thread "main" java.lang.NullPointerException
 **References**
 
 - GoF의 디자인 패턴 - 에릭 감마, 리처드 헬름, 랄프 존슨, 존 블리시디스
-- [https://jdm.kr/blog/235](https://jdm.kr/blog/235)
+- [https://sexycoder.tistory.com/105](https://sexycoder.tistory.com/105)
+
