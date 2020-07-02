@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "책임 연쇄(Chain of Responsibility) 패턴 Feat.Java"
-tags: [Java, Design Pattern, Proxy Pattern, Behavioral Pattern]
+tags: [Java, Design Pattern, Chain of Responsibility Pattern, Behavioral Pattern]
 date: 2020-07-02
 comments: true
 ---
