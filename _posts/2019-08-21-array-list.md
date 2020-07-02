@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: post
 title: "Java 자료구조 파헤치기 #1 ArrayList"
 comments: true
 tags: [JAVA, DataStructure, ArrayList]
