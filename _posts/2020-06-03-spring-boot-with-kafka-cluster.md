@@ -341,7 +341,7 @@ public class GCMPushRestController {
 **GCMPushEntity**
 
 ```java
-package me.sup2is.consumer;
+package me.sup2is.producer;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -441,6 +441,8 @@ Consumer 역시 필요한 의존성 모듈과 application.properties를 추가�
 
 ```
 
+spring-kafka 모듈을 추가한것 외에 별다른 특이점은 없고 spring-starter-web 모듈을 사용하지 않기 때문에 별도로 jackson 관련 라이브러리를 추가해줬다. 
+
 <br>
 
 **application.properties**
@@ -450,6 +452,10 @@ kafka.bootstrapAddress=192.168.56.107:9092,192.168.56.107:9093,192.168.56.107:90
 kafka.my.push.topic.name=app-push-topic
 kafka.my.push.topic.group.name=app-push-group
 ```
+
+컨슈머 애플리케이션은 메시지를 분산시켜서 높은 처리량을 갖도록 구성하기 위해서 **app-push-group**라는 group-id를 지정해줬다.
+
+
 
 ## KafkaConsumerConfig 작성하기
 
