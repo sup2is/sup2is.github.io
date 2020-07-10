@@ -36,16 +36,25 @@ html, body {
 	color: $text;
 	height: 100%;
 }
-h1, h2, h3, h4, h5, h6{
+h1, h2, h3:not(.title), h4, h5, h6{
 	font-weight: 600;
 	margin-bottom: 20px;
+	padding-bottom: 10px;
+    font-style: italic;
 }
+
+h1:not(.title), h2:not(.title), h3:not(.title){
+	border-bottom: 0.3px solid #ddd;
+}
+
 h1 {
 	font-size : 1.8rem;
 }
+
 h2 {
 	font-size : 1.6rem;
 }
+
 h3 {
 	font-size : 1.4rem;
 }
