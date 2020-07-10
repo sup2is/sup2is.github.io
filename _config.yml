@@ -23,14 +23,19 @@ theme_settings :
         value : 80  # Percent value
       - skill : Spring
         value : 80  # Percent value
+      - skill : Kafka
+        value : 60  # Percent value
+      - skill : Redis
+        value : 60  # Percent value
       - skill : SQL
+        value : 50  # Percent value
+      - skill : Vue
         value : 50  # Percent value
       - skill : HTML & CSS3
         value : 30  # Percent value
       - skill : JavaScript
         value : 30  # Percent value
-      - skill : Vue
-        value : 30  # Percent value
+
 
   # Icons
   icons :
