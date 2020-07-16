@@ -1,14 +1,16 @@
+---
 layout: post
 title: "Spring Data Redis로 구현하는 Ranking List"
 tags: [NoSQL, Spring Data Redis, Redis]
-date: 2020-07-16
+date: 2020-07-17
 comments: true
+---
 
 <br>
 
 # OverView
 
-오늘은 Redis의 Sorted Set을 사용한 Ranking API를 만들어보고 RDB에서 ORDER BY 연산자를 통한 SELECT 연산보다 Sorted Set이 얼마나 빠른가에 대해서 알아보도록 하겠다.
+오늘은 Redis의 Sorted Set을 사용한 Ranking API를 만들어보고 약 천만건의 player 데이터를 통해 RDB와 Sorted Set의 성능 차이가 얼마나 있는지에 대해서 알아보도록 하겠다.
 
 # 시작하기 전에
 
@@ -28,15 +30,15 @@ CREATE TABLE player(
 
 약 천만개의 데이터를 score 기준으로 select 해오면 약  **15 sec ~ 16 sec** 이 소요된다.
 
-
+![20200716_155146](https://user-images.githubusercontent.com/30790184/87643684-1e881000-c786-11ea-9d7a-a94f6311d521.png)
 
 작은 서비스라면 상관없겠지만 사용자가 점점 더 증가하는 환경에서 천만개 정도로 약 15~16초가 걸리는 상황이라면 꽤 문제가 있는 상황이다. 사용자가 늘어나면 늘어날 수록 수행시간은 더 길어질 것이다.
 
 이제 이 서비스를 Redis의 Sorted Set을 활용해서 성능개선을 해보도록 하겠다.
 
-# Spring Boot Ranking API
 
-## Spring Boot Redis 관련 설정하기
+
+# Spring Boot Redis 관련 설정하기
 
 먼저 Spring Boot에서 Redis를 사용하기위해서 라이브러리 설정과 Configuration 설정을 해주도록 하겠다.
 
@@ -113,9 +115,11 @@ CREATE TABLE player(
 
 ```
 
-주목할만한 부분은 **spring-boot-starter-data-redis** 모듈이다. 사실 이 모듈(ver 2.3.1)에는 lettuce가 기본 장착되어있기 때문에 redis client로 lettuce를 사용한다면 별도의 모듈을 추가하지 않아도 괜찮다. 
+주목할만한 부분은 **spring-boot-starter-data-redis** 모듈이다. 사실 이 모듈(boot ver 2.3.1)에는 lettuce가 기본 장착되어있기 때문에 redis client로 lettuce를 사용한다면 별도의 모듈을 추가하지 않아도 괜찮다. 
 
 그럼에도 **jedis** 모듈을 추가한건 아래 ''**Redis에 Dummy Data 넣기**''에서 이유를 확인할 수 있다.
+
+이어서 Configuration 설정을 해보자.
 
 **RedisConfig.java**
 
@@ -141,15 +145,15 @@ public class RedisConfig {
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
         return redisTemplate;
     }
 }
 
 ```
 
-RedisConfig 클래스는 RedisTemplate 빈을 등록해주는 역할을 한다. RedisConnectionFactory은 Spring Boot가 알아서 등록해주기 때문에 주입받아서 사용하면 된다. 실제 Redis 관련 설정은 application.yml에 있다.
+RedisConfig 클래스는 RedisTemplate 빈을 등록해주는 역할을 한다. RedisConnectionFactory는 Spring Boot가 알아서 등록해주기 때문에 주입받아서 사용하면 된다. 실제 Redis 관련 설정은 application.yml에 있다.
+
+
 
 **application.yml**
 
@@ -163,7 +167,7 @@ spring:
 
 이제 Redis 관련 설정이 끝났다면 Redis 내부에 Dummy Data를 넣는것부터 시작해보자.
 
-## Redis에 Dummy Data 넣기
+# Redis에 Dummy Data 넣기
 
 Redis는 **Mass insert** 라는 기능을 제공하는데 데이터를 대량으로 삽입하는 api이다. 자세한 정보는 [https://redis.io/topics/mass-insert](https://redis.io/topics/mass-insert)에서 찾아볼 수 있다. 
 
@@ -174,6 +178,10 @@ Mass insert 에 대해서 조금 더 자세하게 알아보는 도중 Redis Clie
 **RedisService.java**
 
 ```java
+package me.sup2is;
+
+//..import
+
 @Service
 public class RedisService {
     
@@ -234,11 +242,11 @@ public class RedisServiceTest {
 
 같은 아이디가 들어갈 수도 있기 때문에 오차범위를 생각해서 약 900만개 이상이면 테스트를 통과하도록 했다. 실제로 레디스 내부에 들어간 데이터는 970만개 정도가 된다.
 
-
+![20200716_163556](https://user-images.githubusercontent.com/30790184/87643681-1def7980-c786-11ea-836a-7bdce6113cb0.png)
 
 이제 Redis 내부에서 상위 5만개 데이터를 가져오는 코드를 작성해보자.
 
-## Redis에서 상위 5만개 데이터 가져오기
+# Redis에서 상위 5만개 데이터 가져오기
 
 **RedisService.java**
 
@@ -291,7 +299,7 @@ public class RedisService {
 
 ```
 
-lettuce나 jedis나 api가 매우 간단하게 설계되어 있어서 zSetOperations의 `reverseRange()`라는 메서드로 간편하게 상위 5만개 데이터를 가져올 수 있다. 이 로직은 아래 redis 명령어와 같은 역할을 한다.
+lettuce나 jedis나 api가 매우 간단하게 설계되어 있어서 Redis 와 통신하는 부분은 간단하게 처리할 수 있다. zSetOperations의 `reverseRange()`라는 메서드로 간편하게 상위 5만개 데이터를 가져올 수 있고 이 로직은 아래 redis 명령어와 같은 역할을 한다.
 
 ```
 zrange player 0 49999
@@ -346,7 +354,7 @@ public class RedisServiceTest {
 프로그램 수행 시간: 0.089
 ```
 
-Maria DB에서 15~16초가 걸리는 것과 비교했을 때 Sorted Set의 수행속도는 평균적으로 0.1초였다. 실제로 사용가능한 Object로 매핑한다고 하더라도 MariaDB 보다는 훨씬 더 빠른 환경에서 데이터를 가져올 수 있다.
+Maria DB에서 15~16초가 걸리는 것과 비교했을 때 Sorted Set의 수행속도는 평균적으로 **0.1**초였다. 실제로 사용가능한 Object로 매핑한다고 하더라도 MariaDB 보다는 훨씬 더 빠른 환경에서 데이터를 가져올 수 있다.
 
 # 마무리
 
@@ -358,7 +366,11 @@ Maria DB에서 15~16초가 걸리는 것과 비교했을 때 Sorted Set의 수�
 포스팅은 여기까지 하겠습니다. 퍼가실때는 출처를 반드시 남겨주세요!
 
 
+예제: https://github.com/sup2is/study/tree/master/db/redis/ranking-list-with-redis
+
+
+
 **References**
 
-- 빅데이터 저장 및 분석을 위한 NoSQL & Redis - 주종면 
-- [https://redis.io/](https://redis.io/)
+- [https://stackoverflow.com/questions/30728409/how-to-do-mass-insertion-in-redis-using-java](https://stackoverflow.com/questions/30728409/how-to-do-mass-insertion-in-redis-using-java)
+
