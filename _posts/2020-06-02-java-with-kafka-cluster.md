@@ -65,11 +65,28 @@ docker run -d \
 차례대로 kafka1, kafka2, kafka3 서버를 띄웠고 환경설정을 간단하게 설명하면
 
 - **KAFKA_ADVERTISED_LISTENERS :** 외부에서 Kafka 서버로 들어오는 IP를 지정할 수 있다. 이 값을 통해 Consumer와 Producer가 Kafka와 연결된다.
-- **KAFKA_LISTENERS :** 내부에서 매핑될 IP를 지정할 수 있다.
 
-KAFKA_ADVERTISED_LISTENERS 와 KAFKA_LISTENERS 에 대한 설명은 아래 링크에서 조금 더 자세한 설명을 확인할 수 있다. 
+- **KAFKA_LISTENERS :** 내외부 통신에 필요한 프로토콜을 지정할 수 있다. 
 
-[https://medium.com/@iamsuraj/what-is-advertised-listeners-in-kafka-72e6fae7d68e](https://medium.com/@iamsuraj/what-is-advertised-listeners-in-kafka-72e6fae7d68e)
+  > ```
+  > # Configure protocol map
+  > listener.security.protocol.map=INTERNAL:PLAINTEXT,EXTERNAL:SSL
+  > # Use plaintext for inter-broker communication
+  > inter.broker.listener.name=INTERNAL
+  > # Specify that Kafka listeners should bind to all local interfaces
+  > listeners=INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:9093
+  > # Separately, specify externally visible address
+  > advertised.listeners=INTERNAL://kafkabroker-n.mydomain.com:9092,EXTERNAL://kafkabroker-n.mydomain.com:9093
+  > ```
+  
+  이렇게 지정하면  외부 클라이언트는 SSL 채널을 통해 포트 9093로 연결하고, 내부 클라이언트는 일반 텍스트 채널을 통해 포트 9092로 연결한다. [https://cloud.google.com/solutions/processing-messages-from-kafka-hosted-outside-gcp?hl=ko](https://cloud.google.com/solutions/processing-messages-from-kafka-hosted-outside-gcp?hl=ko)
+
+
+
+
+
+
+
 
 <br>
 
