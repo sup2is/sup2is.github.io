@@ -120,6 +120,16 @@ a:link, a:visited, a:active, a:hover {
 .display-none{
 	display: none;
 }
+
+code.highlighter-rouge {
+    border-radius: 5px;
+    color: $theme-color;
+    font-size: 0.9rem;
+    padding: 2px 4px;
+    background-color: #f7f7f9;
+    border: 1px solid #e1e1e8;
+}
+
 .highlighter-rouge {
     border-radius: 5px;
     color: $theme-color;
