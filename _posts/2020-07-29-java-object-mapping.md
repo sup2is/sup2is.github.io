@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "Java의 Object Mapping 라이브러리"
+title: "Java Object Mapping"
 tags: [NoSQL, MapStruct, JMapper, Orika]
-date: 2020-07-28
+date: 2020-07-29
 comments: true
 ---
 
@@ -25,75 +25,102 @@ JPA 기반의 API 서버를 구축할때 엔티티를 그대로 반환하는 것
 **Order.java**
 
 ```java
-package me.sup2is.modelmapper;
+package me.sup2is;
 
-import lombok.*;
-
-@Getter
-@Setter
-@ToString
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order {
+
     private Customer customer;
     private Address billingAddress;
     private Address shippingAddress;
+
+    public Order() {
+    }
+
+    public Order(Customer customer, Address billingAddress, Address shippingAddress) {
+        this.customer = customer;
+        this.billingAddress = billingAddress;
+        this.shippingAddress = shippingAddress;
+    }
+
+// getter and setter
 }
 ```
 
 **Customer.java**
 
 ```java
-package me.sup2is.modelmapper;
+package me.sup2is;
 
-import lombok.*;
-
-@Getter
-@Setter
-@ToString
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Customer {
     private String name;
+
+    public Customer() {
+    }
+
+
+    public Customer(String name) {
+        this.name = name;
+    }
+
+
+// getter and setter
 }
 ```
 
 **Address.java**
 
 ```java
-package me.sup2is.modelmapper;
+package me.sup2is;
 
-import lombok.*;
-
-@Getter
-@Setter
-@ToString
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Address {
+
     private String street;
     private String city;
+
+    public Address() {
+    }
+
+    public Address(String street, String city) {
+        this.street = street;
+        this.city = city;
+    }
+
+// getter and setter
 }
+
+
 ```
 
 **OrderDto.java**
 
 ```java
-package me.sup2is.modelmapper;
+package me.sup2is;
 
-import lombok.Data;
-
-@Data
 public class OrderDto {
+
     private String customerName;
     private String shippingStreetAddress;
     private String shippingCity;
     private String billingStreetAddress;
     private String billingCity;
+
+    public OrderDto() {
+    }
+
+    public OrderDto(String customerName, String shippingStreetAddress, String shippingCity, String billingStreetAddress, String billingCity) {
+        this.customerName = customerName;
+        this.shippingStreetAddress = shippingStreetAddress;
+        this.shippingCity = shippingCity;
+        this.billingStreetAddress = billingStreetAddress;
+        this.billingCity = billingCity;
+    }
+
+//getter and setter
+
 }
 ```
 
-이제 Mapstruct을 사용해서 객체 매핑을 구현해보도록 하겠다.
+이제 MapStruct, JMapper, Orika를 사용해서 객체 매핑을 구현해보도록 하겠다.
 
 # MapStruct
 
@@ -112,13 +139,13 @@ public interface CarMapper {
 }
 ```
 
-인터페이스를 선언함과 동시에 MapStruct가 자동으로 컴파일타임에 구현체를 만들어 실제 사용 가능한 상태로 만든다.
+**인터페이스를 선언함과 동시에 MapStruct가 자동으로 컴파일타임에 구현체를 만들어 실제 사용 가능한 상태로 만든다.**
 
 MapStruct의 장점 세가지에 대해 소개한다.
 
-1. 리플렉션을 사용하지 않고 메서드 호출을 사용해서 빠른 실행
-2. 컴파일 타임에 타입을 검사하고 명시적이다.
-3. 컴파일 타임에 잘못된 정보를 알려준다.
+1. **리플렉션을 사용하지 않고 메서드 호출을 사용해서 빠른 실행**
+2. **컴파일 타임에 타입을 검사하고 명시적이다.**
+3. **컴파일 타임에 잘못된 정보를 알려준다.**
 
 간단한 엔티티 클래스들을 생성하고 MapStruct를 사용해서 매핑을 구현해보자.
 
@@ -198,7 +225,7 @@ public interface MapStructOrderMapper {
 
 준비가완료됐다면 컴파일을 한 뒤에 target 디렉토리에서 `MapStructOrderMapperImpl.class`가 적절하게 생성되었는지 확인해보자.
 
-**MapStructOrderMapperImpl.class**
+**자동으로 만들어진 MapStructOrderMapperImpl.class**
 
 ```java
 package me.sup2is.modelmapper;
@@ -512,20 +539,155 @@ public void givenUser_whenUseApi_thenConverted(){
 
 # Orika
 
-마지막으로 Orika에 대해서 알아보도록 하겠다.
+마지막으로 Orika에 대해서 알아보도록 하겠다. Orika도 apache 2.0 라이센스 오픈소스 프로젝트이다. 한국에서는 많이 사용하지 않지만 점유율이 꽤 높은편에 속한다. [https://github.com/orika-mapper/orika](https://github.com/orika-mapper/orika)
+
+다음은 Orika가 제공하는 기능들이다.
+
+- Map complex and deeply structured objects
+- "Flatten" or "Expand" objects by mapping nested properties to top-level properties, and vice versa
+- Create mappers on-the-fly, and apply customizations to control some or all of the mapping
+- Create converters for complete control over the mapping of a specific set of objects anywhere in the object graph--by type, or even by specific property name
+- Handle proxies or enhanced objects (like those of Hibernate, or the various mock frameworks)
+- Apply bi-directional mapping with one configuration
+- Map to instances of an appropriate concrete class for a target abstract class or interface
+- Map POJO properties to Lists, Arrays, and Maps
+
+## Orika 사용하기
+
+의존성을 추가해준다.
+
+```xml
+        <dependency>
+            <groupId>ma.glasnost.orika</groupId>
+            <artifactId>orika-core</artifactId>
+            <version>1.5.4</version>
+        </dependency>
+```
+
+다른 라이브러리들과 비슷하게 사용하기때문에 크게 어려운 점은 없을 것 같다.
+
+**OrikaTest.java**
+
+```java
+package me.sup2is;
+
+import ma.glasnost.orika.BoundMapperFacade;
+import ma.glasnost.orika.MapperFacade;
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.converter.ConverterFactory;
+import ma.glasnost.orika.impl.DefaultMapperFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class OrikaTest {
+
+    @Test
+    public void orika_mapping() {
+        //given
+        MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
+        mapperFactory.classMap(OrderDto.class, Order.class)
+                .field("customerName","customer.name")
+                .field("shippingStreetAddress", "shippingAddress.street")
+                .field("shippingCity", "shippingAddress.city")
+                .field("billingStreetAddress", "billingAddress.street")
+                .field("billingCity", "billingAddress.city")
+                .register();
 
 
+        Address billingAddress = new Address("경리단길", "서울");
+        Address shippingAddress = new Address("광평로", "서울");
+        Customer customer = new Customer("sup2is");
+        Order order = new Order(customer, billingAddress, shippingAddress);
+
+        //when
+        MapperFacade mapperFacade = mapperFactory.getMapperFacade();
+        OrderDto orderDto = mapperFacade.map(order, OrderDto.class);
+
+        //then
+        assertEquals(billingAddress.getCity(), orderDto.getBillingCity());
+        assertEquals(billingAddress.getStreet(), orderDto.getBillingStreetAddress());
+        assertEquals(shippingAddress.getCity(), orderDto.getShippingCity());
+        assertEquals(shippingAddress.getStreet(), orderDto.getShippingStreetAddress());
+        assertEquals(customer.getName(), orderDto.getCustomerName());
+    }
+
+```
+
+양방향 매핑, 매핑과정에서 특정 로직을 수행하고싶다면 별도의 `Converter`를 생성할 수 있다.
+
+**MyOrikaConverter.java**
+
+```java
+package me.sup2is;
+
+import ma.glasnost.orika.MappingContext;
+import ma.glasnost.orika.converter.BidirectionalConverter;
+import ma.glasnost.orika.metadata.Type;
+
+public class MyOrikaConverter extends BidirectionalConverter<Order, OrderDto> {
+    @Override
+    public OrderDto convertTo(Order source, Type<OrderDto> destinationType, MappingContext mappingContext) {
+        return new OrderDto(source.getCustomer().getName(),
+                source.getShippingAddress().getStreet(),
+                source.getShippingAddress().getCity(),
+                source.getBillingAddress().getStreet(),
+                source.getBillingAddress().getCity());
+    }
+
+    @Override
+    public Order convertFrom(OrderDto source, Type<Order> destinationType, MappingContext mappingContext) {
+        return new Order(new Customer(source.getCustomerName()),
+                new Address(source.getBillingStreetAddress(), source.getBillingCity()),
+                new Address(source.getShippingStreetAddress(), source.getShippingCity()));
+    }
+}
+
+```
+
+이렇게 생성한 Converter를 등록시켜주기만 하면 정상적으로 동작하는것을 확인할 수 있다. `BoundMapperFacade` 를 사용해서 양방향 으로 매핑이 잘 되는지 확인해 보자.
+
+```java
+    @Test
+    public void orika_map_reverse() {
+        //given
+        MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
+        ConverterFactory converterFactory = mapperFactory.getConverterFactory();
+        converterFactory.registerConverter(new MyOrikaConverter());
+
+        Address billingAddress = new Address("경리단길", "서울");
+        Address shippingAddress = new Address("광평로", "서울");
+        Customer customer = new Customer("sup2is");
+        Order order = new Order(customer, billingAddress, shippingAddress);
+        BoundMapperFacade<Order, OrderDto> boundMapperFacade = mapperFactory.getMapperFacade(Order.class, OrderDto.class);
+        OrderDto orderDto = boundMapperFacade.map(order);
+
+        //when
+        Order toOrder = boundMapperFacade.mapReverse(orderDto);
+
+        //then
+        assertEquals(orderDto.getBillingCity(), toOrder.getBillingAddress().getCity());
+        assertEquals(orderDto.getBillingStreetAddress(), toOrder.getBillingAddress().getStreet());
+        assertEquals(orderDto.getCustomerName(), toOrder.getCustomer().getName());
+        assertEquals(orderDto.getShippingCity(), toOrder.getShippingAddress().getCity());
+        assertEquals(orderDto.getShippingStreetAddress(), toOrder.getShippingAddress().getStreet());
+    }
+```
+
+테스트가 문제없이 동작하는 것을 확인할 수 있다.
 
 # 마무리
 
-총 세가지의 Object Mapping 라이브러리들을 확인했는데 점유율 순으로 보면 MapStruct가 압도적인 1위를 차지하고있다. 많은 사람들이 사용하기때문에 그만큼 성능도 보장되어있고 새로운 기능이나 버그픽스가 더 빠르게 이루어질것이다. 그리고 실제로 사용했을때도 MapStruct를 사용하면 코드를 가장 깔끔하게 유지할 수 있는 것 같다.
-
-
+총 세가지의 Object Mapping 라이브러리들을 확인했는데 점유율 순으로 보면 MapStruct가 압도적인 1위를 차지하고있다. 많은 사람들이 사용하기때문에 그만큼 성능도 보장되어있고 새로운 기능이나 버그픽스가 더 빠르게 이루어질것이다. 그리고 실제로 사용했을때도 MapStruct를 사용할때 코드가 가장 깔끔하고 컴파일타임에 거의 웬만한 에러를 감지할 수 있어서 개발 단계에서도 빠르게 사용할 수 있을 것 같다.
 
 
 
 <hr>
 포스팅은 여기까지 하겠습니다. 퍼가실때는 출처를 반드시 남겨주세요!
+<br>
+
+예제: [https://github.com/sup2is/study/tree/master/java/java-object-mapping](https://github.com/sup2is/study/tree/master/java/java-object-mapping)
+
 
 
 **References**
@@ -533,3 +695,5 @@ public void givenUser_whenUseApi_thenConverted(){
 - [https://www.baeldung.com/java-performance-mapping-frameworks](https://www.baeldung.com/java-performance-mapping-frameworks)
 - [https://mapstruct.org/documentation/dev/reference/html/](https://mapstruct.org/documentation/dev/reference/html/)
 - [https://www.baeldung.com/jmapper](https://www.baeldung.com/jmapper)
+- [https://orika-mapper.github.io/orika-docs/](https://orika-mapper.github.io/orika-docs/)
+- [https://www.baeldung.com/orika-mapping](https://www.baeldung.com/orika-mapping)
