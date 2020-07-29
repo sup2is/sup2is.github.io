@@ -100,19 +100,11 @@ INSERT INTO test(id, name, email, department) values (5, 'lee', 'lee@gmail.com',
      24
      25 # unique name for the cluster, used in forming the Connect cluster group. Note that this must not conflict with consumer group IDs
      26 group.id=connect-cluster-exam
-     
-     
-     
-     ...
-     
-     85 # plugin.path=/usr/local/share/java,/usr/local/share/kafka/plugins,/opt/connectors,
-     86 plugin.path=/usr/share/java
+
 
 ```
 
 23과 26번 라인 정도에 **bootstrap.servers** 와 **group.id**를 수정해준다. bootstrap.servers는 카프카 클러스터를 구성하는 브로커들의 ip를 적어주면되고 group.id는 커넥터 클러스터를 위한 고유한 이름을 지정해주면 된다. 이 아이디는 컨슈머 그룹의 id와 겹치면 안된다.
-
-86번에는 kafka connector가 실행되면서 사용할 plugin의 경로를 직접 설정할 수 있다. 아래에서 mariadb connector/j jar파일을 설정할 것이다.
 
 설정이 끝났다면 kafka home 디렉토리에서 아래 명령어로 카프카 커넥트 서버를 올려준다.
 
@@ -154,6 +146,8 @@ mariadb를 연결하기 위해서는 별도의 플러그인 jar파일이 필요�
 
 **No suitable driver found for jdbc:mysql** 같은 에러가 나올 수 있고 이 에러는 jar파일의 경로문제이다.(~~개고생했음~~) 각자 환경에따라 알맞게 구성해야한다.
 
+> apache kafka의 경우 kafka 폴더 내부에 /libs 경로에 넣으면 잘 동작할 것이다.
+
  **mariadb-java-client-2.6.0** 파일이 준비가 되었다면 JdbcSourceConnector가 plugin으로 설치가 되었는지를 다음의 명령어로 확인해보자
 
 ```
@@ -184,6 +178,8 @@ curl http://localhost:8083/connector-plugins | python -m json.tool
 
 1. Confluent Platform에는 이미 kafka-connect-jdbc.jar 파일이  **/{confluent kafka home}/share/java/kafka-connect-jdbc/** 내부에 존재한다. 만약 없다면 [https://www.confluent.io/hub/](https://www.confluent.io/hub/) 에 가서 **Kafka Connect JDBC**라는 이름으로 검색해서 관련 파일을 받는다.
 2. kafka.connect.jdbc.jar파일을 위에서 사용했던 **/{confluent kafka home}/share/java/kafka/**에 넣고 재기동 한 뒤 다시 **curl localhost:8083/connector-plugins \| python -m json.tool**을 실행해본다.
+
+> 마찬가지로 apache kafka의 경우 kafka 폴더 내부에 /libs 경로에 넣으면 잘 동작할 것이다.
 
 
 
