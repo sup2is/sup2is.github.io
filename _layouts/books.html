@@ -23,5 +23,14 @@ layout: page
     </div>
     <div class="bg"></div>
   </section>
-  {% include books.html %}
+    <section id="books" class="row">
+    <article class="col-12 col-md-6">
+      {% capture book-list-2020 %}{% include book-list-2020.md %}{% endcapture %}
+      {{ book-list-2020 | markdownify }}
+    </article>
+    <article class="col-12 col-md-6">
+      {% capture a-list-of-books-to-read %}{% include a-list-of-books-to-read.md %}{% endcapture %}
+      {{ a-list-of-books-to-read | markdownify }}
+    </article>
+  </section>
 </div>
