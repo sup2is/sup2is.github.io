@@ -13,6 +13,9 @@
       <a href="{{ site.url }}/portfolio">
         <li class="btn-nav">Portfolio</li>
       </a>
+      <a href="{{ site.url }}/books">
+        <li class="btn-nav">Books</li>
+      </a>
       <!-- portfolio -->
       {% when 'portfolio'%}
       <a href="{{ site.url }}">
@@ -22,6 +25,20 @@
         <li class="btn-nav">Tags</li>
       </a>
       <li class="current">Portfolio</li>
+      <a href="{{ site.url }}/books">
+        <li class="btn-nav">Books</li>
+      </a>
+      {% when 'books'%}
+      <a href="{{ site.url }}">
+        <li class="btn-nav">Blog</li>
+      </a>
+      <a href="{{ site.url }}/tags">
+        <li class="btn-nav">Tags</li>
+      </a>
+      <a href="{{ site.url }}/portfolio">
+        <li class="btn-nav">Portfolio</li>
+      </a>
+      <li class="current">Books</li>
       {% else %}
       <!-- others -->
       <a href="{{ site.url }}">
@@ -32,6 +49,9 @@
       </a>
       <a href="{{ site.url }}/portfolio">
         <li class="btn-nav">Portfolio</li>
+      </a>
+      <a href="{{ site.url }}/books">
+        <li class="btn-nav">Books</li>
       </a>
       {% endcase %}
     </ul>
