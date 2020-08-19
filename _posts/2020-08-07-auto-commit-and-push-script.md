@@ -120,7 +120,7 @@ total 4
       4 
       5 baseDir=/root/algorithm
       6 cd ${baseDir}
-      7 filePath=`git status -s | head -n 1`
+      7 filePath=`git status -u -s | head -n 1`
       8 filePath=${filePath:3}
       9 
      10 if [ -z "$filePath" ]; then
@@ -142,20 +142,22 @@ total 4
 
 매우 간단한 스크립트이지만 나같은 사람을 위해 정리해보자면.
 
-- 5 ~ 8 : git이 관리하는 /root/algorithm 디렉토리에서 `git status -s | head -n 1` 를 사용해서 untracked file을 한개 가져온다. 보통의 `git status` 명령어는 `git status --long` 명령어로 동작한다. `-s` 또는 `--short` 옵션을 준다면 untracked file목록만 출력한다.
+- 5 ~ 8 : git이 관리하는 /root/algorithm 디렉토리에서 `git status -u -s | head -n 1` 를 사용해서 untracked file을 한개 가져온다. 보통의 `git status` 명령어는 `git status --long` 명령어로 동작한다. `-s` 또는 `--short` 옵션을 준다면 untracked file목록만 출력한다. `-u` 옵션의 경우 untracked 파일들을 나타내는 옵션이다. 이 옵션을 주면 파일의 pull path를 얻어올 수 있다.
 - 10 ~ 13 : ` -z "$filePath" `를 사용해서 가져온 filePath가 공백인지 검사한다. 공백이라면 아무것도 커밋할게 없으니 그대로 종료시킨다.
 - 15 ~ 17 : filePath로 이동해서 `ls -1 | head -1` 명령어로 커밋할 파일명을 가져온 뒤 `cat $filename | head -1` 명령어를 사용해서 파일 최상단에 커밋 메시지를 읽어온다.
 - 19 ~ 22 : 현재 디렉토리를 `git add` 명령어로 staging 시키고 `git commit + git push` 를 사용해서 푸시한다.
-- 이렇게 작성한 뒤 `git config --global user.name`, `git config --global user.email` 를 지정하고 초기 username과 password만 잘 입력해준다.
-- `crontab`같은 스케쥴러에 해당 쉘을 등록시킨다. 나같은경우는 매일 밤 11시에 쉘파일을 실행하도록 설정했다. (GCP 리전을 US로 잡은 경우 미국시간이니 주의할것 !)
+- 이렇게 작성한 뒤 `git config --global user.name`, `git config --global user.email` 에 적절한 값을 셋팅한다.
+- `crontab`같은 스케쥴러에 해당 쉘을 등록시킨다. 나같은경우는 매일 밤 11시에 쉘파일을 실행하도록 설정했다. (**github의 contribution graph는 사용하고 있는 pc의 커밋시간에 따라 적용되기때문에 시간을 잘 확인할 것!**)
 - `${filePath:3}` 또는 `${commitMsg:2}`를 사용해서 필요 없는 문자를 잘라냈다.
-- 별다른 설정이 없다면 초기 커밋시에는 username, password를 요구할 수 있으니 주의하자. git credential 에 관련된 정보는 [[https://git-scm.com/book/ko/v2/Git-%EB%8F%84%EA%B5%AC-Credential-%EC%A0%80%EC%9E%A5%EC%86%8C](https://git-scm.com/book/ko/v2/Git-도구-Credential-저장소)](https://git-scm.com/book/ko/v2/Git-%EB%8F%84%EA%B5%AC-Credential-%EC%A0%80%EC%9E%A5%EC%86%8C) 에서 확인할 수 있다.
+- 별다른 설정이 없다면 커밋시에는 username, password를 요구할 수 있으니 주의하자. `git config --global credential.helper store` 로 설정해 놓는다면 초기 커밋 이후에 인증 정보를 저장시킨다. git credential 에 관련된 정보는 [[https://git-scm.com/book/ko/v2/Git-%EB%8F%84%EA%B5%AC-Credential-%EC%A0%80%EC%9E%A5%EC%86%8C](https://git-scm.com/book/ko/v2/Git-도구-Credential-저장소)](https://git-scm.com/book/ko/v2/Git-%EB%8F%84%EA%B5%AC-Credential-%EC%A0%80%EC%9E%A5%EC%86%8C) 에서 확인할 수 있다.
 
 1일 1커밋을 실천하고 있지만 약 1주일동안 컴퓨터의 사용이 어려울것이라고 예상된다면 미리 1주일치 알고리즘을 풀어놓자. 풀어놓은 뒤에 개인서버에 올려두기만 한다면 자동화된 스크립트가 알아서 github에 푸시해줄 것이다.
 
 # 마무리
 
-만약 github 전체 repo에서 가장 최근 커밋을 가져오는 api가 있다면 날짜를 비교해서 밤 11시까지 커밋이 없을때 쉘 파일을 실행시키도록 하고 싶었으나 아쉽게도 [https://developer.github.com/](https://developer.github.com/) 에서 지원해주지 않는것 같다.. 비슷한 방법을 찾아낸다면 업데이트해야겠다.
+~~만약 github 전체 repo에서 가장 최근 커밋을 가져오는 api가 있다면 날짜를 비교해서 밤 11시까지 커밋이 없을때 쉘 파일을 실행시키도록 하고 싶었으나 아쉽게도 [https://developer.github.com/](https://developer.github.com/) 에서 지원해주지 않는것 같다.. 비슷한 방법을 찾아낸다면 업데이트해야겠다.~~
+
+현재는 nodejs의 express 웹 프레임워크로 간단한 서버를 올려놓고 http://xxx.xxx.xxx/push 로 GET요청을 보내면 해당 쉘 파일을 실행시키게 한뒤 [sendgrid](https://sendgrid.com/) 를 사용해서 push 이후 결과 메일을 전송시키도록 구성했다.
 
 
 
