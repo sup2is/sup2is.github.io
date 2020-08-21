@@ -9,7 +9,7 @@ theme_settings :
 
   # Profile Settings
   profile :
-    image : assets/img/smile.jpg
+    image : assets/img/main.jpg
     username : HyeonSeop Choi
     description : 안녕하세요 저는 Junior java developer 입니다. 배우고 싶은 기술이나 TIL 관련 글을 포스팅하는 블로그입니다. 부족한 실력이라 영어 문장에 오역이 있을 수 있고 잘못된 지식을 전파 할 수 있습니다. 피드백은 언제나 환영합니다. :) 감사합니다.
     experience :
