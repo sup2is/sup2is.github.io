@@ -56,7 +56,17 @@ Redis Cluster는 강력한 일관성을 보장하지 않는데 다음과 같은 
 
 # Redis Cluster 구성하기
 
-Redis Cluster를 구성하기 위해서는 최소 3대의 노드가 필요하고 각각 1개씩 레플리카를 구성하려면 총 6개의 노드가 필요하다. 직접 구성해보는것도 좋지만 레디스에서 제공하는 create-cluster 스크립트를 활용해서 간단하게 구성할 수 있다. 관련된 docker-compose는 여기에서 확인할 수 있다.[https://hub.docker.com/r/bitnami/redis-cluster](https://hub.docker.com/r/bitnami/redis-cluster)
+먼저 레디스가 설치되지 않았다면 레디스를 설치한다. 다운로드: [https://redis.io/download](https://redis.io/download)
+
+Redis Cluster를 구성하기 위해서는 최소 3대의 노드가 필요하고 각각 1개씩 레플리카를 구성하려면 총 6개의 노드가 필요하다. 직접 구성해보는것도 좋지만 **레디스에서 제공하는 create-cluster 스크립트를 활용해서 간단하게 구성할 수 있다.** 
+
+<br>
+
+> - 관련된 docker-compose는 여기에서 확인할 수 있다.[https://hub.docker.com/r/bitnami/redis-cluster](https://hub.docker.com/r/bitnami/redis-cluster)
+
+<br>
+
+
 
 레디스가 제공하는 create-cluster 스크립트의 위치는 다음과같다
 
@@ -127,11 +137,12 @@ OK
 클러스터에 접속할때도 redis-cli 도구를 사용하지만 반드시 `-c` 옵션을 넣어주어야한다. 몇가지 값은 해싱알고리즘에 의해 적절한 곳으로 분산처리된다. 실제 **12182**번 슬롯을 담당하는 **30003** 서버에 접속해서 **foo**값을 확인해보자.
 
 ```
-[root@test src]# ./redis-cli -p 30003
+[root@test src]# ./redis-cli -c -p 30003
 127.0.0.1:30003> get foo
 "bar"
 127.0.0.1:30003> get hello
-(error) MOVED 866 127.0.0.1:30001
+-> Redirected to slot [866] located at 127.0.0.1:30001
+"world"
 ```
 
 30003 서버에는 **foo** 값은 존재하지만 **hello**라는 값은 866 슬롯을 담당하는 30001번에 있음을 알려주고 있다.
@@ -150,7 +161,7 @@ OK
 741b7f1e34ed6186d2526133672be20002d65ccb 127.0.0.1:30001@40001 myself,master - 0 1595312805000 1 connected 0-5460
 ```
 
-눈치가 빠르다면 위에 로그만 봐도 **0ac65f8981390** 시작하는 **30003** 서버의 slave가 **30005**번 서버임을 알 수 있다. 이제 **30003** 서버를 약 30초가량 중지시켜서 **30005**번 서버가 마스터로 승격되는지 한번 확인해보자.
+**0ac65f8981390** 시작하는 **30003** 서버의 slave가 **30005**번 서버임을 알 수 있다. 이제 **30003** 서버를 약 30초가량 중지시켜서 **30005**번 서버가 마스터로 승격되는지 한번 확인해보자.
 
 ```
 [root@test src]# ./redis-cli -p 30003 DEBUG sleep 30
