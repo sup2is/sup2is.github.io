@@ -103,7 +103,14 @@ docker-compose up -d
 
 이제 마스터노드에서 몇가지 명령어로 복제가 잘 되고 있는지 확인해보자. 쉘을 3개 띄워서 각각 redis 서버로 접속해서 테스트해보자.
 
-마스터쪽에 `set test-key test-value` 라는 명령어로 key-value 데이터를 지정하면 슬레이브쪽으로 데이터가 복제되는것을 확인할 수 있다.
+<br>
+
+> - redis shell에 접속하는 방법은 redis-cli 설치 (참고: [https://jojoldu.tistory.com/348](https://jojoldu.tistory.com/348))또는 다음 명령어를 통해 접속하는 방법이 있다. `docker run -it --network some-network --rm redis redis-cli -h some-redis` 
+> - 이 글은 redis-cli 도구를 설치해서 사용한다.
+
+<br>
+
+마스터쪽 에 `set test-key test-value` 라는 명령어로 key-value 데이터를 지정하면 슬레이브쪽으로 데이터가 복제되는것을 확인할 수 있다.
 
 ![20200721_093518](https://user-images.githubusercontent.com/30790184/87999370-84cdb380-cb35-11ea-87b1-22d67db80b76.png)
 
@@ -112,6 +119,8 @@ docker-compose up -d
 ![20200721_093513](https://user-images.githubusercontent.com/30790184/87999368-84351d00-cb35-11ea-8d58-0cb8f9459c0d.png)
 
 
+
+> 이외에도 `info` 명령어를 통해 redis 관련 정보를 확인할 수 있다.
 
 # Redis Sentinel
 
@@ -130,12 +139,6 @@ Redis Sentinel은 다음 네가지 기능을 제공한다.
 sentinel monitor mymaster 127.0.0.1 6379 2
 sentinel down-after-milliseconds mymaster 60000
 sentinel failover-timeout mymaster 180000
-sentinel parallel-syncs mymaster 1
-
-sentinel monitor resque 192.168.1.3 6380 4
-sentinel down-after-milliseconds resque 10000
-sentinel failover-timeout resque 180000
-sentinel parallel-syncs resque 5
 ```
 
 첫번째줄에 `sentinel monitor mymaster 127.0.0.1 6379 2` 를 살펴보면 맨마지막에 입력된 `2` 라는 값은 quorum이라는 값인데 **마스터의 장애를 동의하는 센티널 개수**이다. 이후에 마스터의 장애를 판명지었다면 **센티넬 공정에따라 새로운 마스터의 승격 자격을 가진 센티널들을 투표하고 선택된 센티넬이 새로운 마스터를 승격**시킨다. 따라서 센티넬은 홀수개로 구성하는 것을 권장한다.
@@ -153,19 +156,55 @@ sentinel parallel-syncs resque 5
     image: 'bitnami/redis-sentinel:latest'
     environment:
       - REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS=3000
+      - REDIS_MASTER_HOST=redis
+      - REDIS_MASTER_PORT_NUMBER=6379
+      - REDIS_MASTER_SET=mymaster
+      - REDIS_SENTINEL_QUORUM=2
     depends_on:
       - redis
       - redis-slave-1
       - redis-slave-2
     ports:
-      - '26379-26481:26379'
+      - '26379-26381:26379'
     networks:
       - app-tier
 ```
 
 - **REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS :** 센티넬이 마스터노드의 장애여부를 판단하는 시간이다. 테스트를위해 3초로 지정해놨다.
+- **REDIS_MASTER_HOST :** master 노드의 호스트
+- **REDIS_MASTER_PORT_NUMBER :** master 노드의 포트번호
+- **REDIS_MASTER_SET :** 모니터링 할 Redis 인스턴스 set의 이름
+- **REDIS_SENTINEL_QUORUM :** master의 장애를 동의하는 센티널의 개수
 
-컨테이너를 `docker-compose up --scale redis-sentinel=3 -d ` 명령어로 업데이트해서 센티넬 개수를 3개로 늘려주자. 이후에 `redis-cli -p 26379`  명령어를 통해 센티넬 쉘에 접속한 뒤 `info` 명령어를 입력해보자.
+<br>
+
+> 이외에도 추가적인 설정이 필요하다면 참고해도 좋다.
+>
+> - `REDIS_MASTER_HOST`: Host of the Redis master to monitor. Default: **redis**.
+> - `REDIS_MASTER_PORT_NUMBER`: Port of the Redis master to monitor. Default: **6379**.
+> - `REDIS_MASTER_SET`: Name of the set of Redis instances to monitor. Default: **mymaster**.
+> - `REDIS_MASTER_PASSWORD`: Password to authenticate with the master. No defaults. As an alternative, you can mount a file with the password and set the `REDIS_MASTER_PASSWORD_FILE` variable.
+> - `REDIS_MASTER_USER`: Username to authenticate with when ACL is enabled for the master. No defaults. This is available only for redis 6 or higher. If not specified, Redis Sentinel will try to authenticate with just the password (using `sentinel auth-pass <master-name> <password>`).
+> - `REDIS_SENTINEL_PORT_NUMBER`: Redis Sentinel port. Default: **26379**.
+> - `REDIS_SENTINEL_QUORUM`: Number of Sentinels that need to agree about the fact the master is not reachable. Default: **2**.
+> - `REDIS_SENTINEL_PASSWORD`: Password to authenticate with this sentinel and to authenticate to other sentinels. No defaults. Needs to be identical on all sentinels. As an alternative, you can mount a file with the password and set the `REDIS_SENTINEL_PASSWORD_FILE` variable.
+> - `REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS`: Number of milliseconds before master is declared down. Default: **60000**.
+> - `REDIS_SENTINEL_FAILOVER_TIMEOUT`: Specifies the failover timeout in milliseconds. Default: **180000**.
+> - `REDIS_SENTINEL_TLS_ENABLED`: Whether to enable TLS for traffic or not. Default: **no**.
+> - `REDIS_SENTINEL_TLS_PORT_NUMBER`: Port used for TLS secure traffic. Default: **26379**.
+> - `REDIS_SENTINEL_TLS_CERT_FILE`: File containing the certificate file for the TSL traffic. No defaults.
+> - `REDIS_SENTINEL_TLS_KEY_FILE`: File containing the key for certificate. No defaults.
+> - `REDIS_SENTINEL_TLS_CA_FILE`: File containing the CA of the certificate. No defaults.
+> - `REDIS_SENTINEL_TLS_DH_PARAMS_FILE`: File containing DH params (in order to support DH based ciphers). No defaults.
+> - `REDIS_SENTINEL_TLS_AUTH_CLIENTS`: Whether to require clients to authenticate or not. Default: **yes**.
+> - `REDIS_SENTINEL_ANNOUNCE_IP`: Use the specified IP address in the HELLO messages used to gossip its presence. Default: **auto-detected local address**.
+> - `REDIS_SENTINEL_ANNOUNCE_PORT`: Use the specified port in the HELLO messages used to gossip its presence. Default: **port specified in `REDIS_SENTINEL_PORT_NUMBER`**.
+
+
+
+<br>
+
+컨테이너를 `docker-compose up --scale redis-sentinel=3 -d ` 명령어로 업데이트해서 센티넬 개수를 3개로 늘려주자. 센티넬 쉘에 접속한 뒤 `info` 명령어를 입력해보자.
 
 센티넬 관련된 정보가 아래와 같이 나올것이다.
 
@@ -247,7 +286,7 @@ SENTINEL get-master-addr-by-name mymaster
 redis-cli -p 6379 DEBUG sleep 30
 ```
 
-센티넬 로그를 보면 약 3초뒤에 다음과같은 로그가 찍히는 것을 확인할 수 있다.
+`docker logs -f {sentinel id}` 명령어를 사용해서 센티넬 로그를 확인해보면 약 3초뒤에 다음과같은 로그가 찍히는 것을 확인할 수 있다.
 
 ![20200721_094929](https://user-images.githubusercontent.com/30790184/88000002-7e403b80-cb37-11ea-94be-0672019288df.png)
 
