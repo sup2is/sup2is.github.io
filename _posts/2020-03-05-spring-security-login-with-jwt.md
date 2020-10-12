@@ -199,7 +199,6 @@ package me.sup2is.jwtsecurity.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -228,14 +227,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private DataSource dataSource;
 
-    @Autowired
-    private AuthenticationProvider authenticationProvider;
-
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
         auth.jdbcAuthentication().dataSource(dataSource);
-        auth.authenticationProvider(authenticationProvider);
         auth
                 .userDetailsService(userDetailsService)
                 .passwordEncoder(passwordEncoder());
@@ -276,10 +271,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 - .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
   \- Spring Security에서 Session을 생성하거나 사용하지 않도록 설정한다.
-
-- auth.authenticationProvider(jwtUserDetailsService)
-
-  \- **jwtUserDetailsService** 역시 실제로 구현해서 사용한다. 구현은 아래에 있다.
 
 - http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -333,6 +324,7 @@ import me.sup2is.jwtsecurity.member.Member;
 import me.sup2is.jwtsecurity.member.MemberRepository;
 import me.sup2is.jwtsecurity.member.Role;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -349,7 +341,7 @@ import java.util.Set;
 public class JwtUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private PasswordEncoder encoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -367,11 +359,22 @@ public class JwtUserDetailsService implements UserDetailsService {
         return new User(member.getEmail(), member.getPassword(), grantedAuthorities);
     }
 
+    public Member authenticateByEmailAndPassword(String email, String password) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(email));
+
+        if(!passwordEncoder.matches(password, member.getPassword())) {
+            throw new BadCredentialsException("Password not matched");
+        }
+
+        return member;
+    }
+
 }
 
 ```
 
-**JwtUserDetailsService**는 들어온 **email**으로 Member를 찾아서 결과적으로 User 객체를 반환해주는 역할을 한다.
+**JwtUserDetailsService**는 들어온 **email**으로 Member를 찾아서 결과적으로 User 객체를 반환해주는 역할 + 컨트롤러에서 넘어온 email과 password 값이 db에 저장된 비밀번호와 일치하는지 검사한다.
 
 <br>
 
@@ -399,7 +402,7 @@ public class JwtTokenUtil {
     public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 
     public String getUsernameFromToken(String token) {
-        return getClaimFromToken(token, Claims::getSubject);
+        return getClaimFromToken(token, Claims::getId);
     }
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
@@ -420,15 +423,18 @@ public class JwtTokenUtil {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername());
+    public String generateToken(String id) {
+        return generateToken(id, new HashMap<>());
     }
 
-    private String doGenerateToken(Map<String, Object> claims, String username) {
+    public String generateToken(String id, Map<String, Object> claims) {
+        return doGenerateToken(id, claims);
+    }
+
+    private String doGenerateToken(String id, Map<String, Object> claims) {
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(username)
+                .setId(id)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
                 .signWith(SignatureAlgorithm.HS512, secret)
@@ -470,6 +476,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -479,6 +488,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+
+    private static final List<String> EXCLUDE_URL =
+            Collections.unmodifiableList(
+                    Arrays.asList(
+                        "/api/member",
+                        "/authenticate"
+                    ));
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -516,6 +533,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request,response);
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return EXCLUDE_URL.stream().anyMatch(exclude -> exclude.equalsIgnoreCase(request.getServletPath()));
+    }
+
 }
 
 ```
@@ -524,51 +547,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 로직에서는 헤더에서 **Authorization**값을 꺼내어 토큰을 검사하고 해당 유저가 실제 DB에 있는지 검사하는 등의 전반적인 인증처리를 여기서 진행한다.
 
-<br>
-
-**JwtAuthenticationProvider.java**
-
-```java
-package me.sup2is.jwtsecurity.config;
-
-import me.sup2is.jwtsecurity.member.Member;
-import me.sup2is.jwtsecurity.member.MemberRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
-
-@Component
-public class JwtAuthenticationProvider implements AuthenticationProvider {
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        String email = authentication.getName();
-        String password = authentication.getCredentials().toString();
-
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
-
-        if(!member.getPassword().equals(password)) {
-            throw new RuntimeException("UnAuthorized");
-        }
-        return new UsernamePasswordAuthenticationToken(email, password);
-    }
-
-    @Override
-    public boolean supports(Class<?> authentication) {
-        return authentication.equals(UsernamePasswordAuthenticationToken.class);
-    }
-}
-
-```
-
-**JwtAuthenticationProvider** 에서는 **AuthenticationProvider**의 **authenticate()** 메서드를 구현하여 인증처리를 도와준다 실제 존재하는 email인지 확인하고 요청된 password와 대조하는 역할을 한다
+추가적으로 **shouldNotFilter()** 메서드를 사용해서 exclude 시킬 url을 지정할 수 있다.
 
 
 
@@ -581,6 +560,7 @@ package me.sup2is.jwtsecurity.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import me.sup2is.jwtsecurity.member.Member;
 import me.sup2is.jwtsecurity.service.JwtUserDetailsService;
 import me.sup2is.jwtsecurity.config.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -598,37 +578,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class JwtAuthenticationController {
 
     @Autowired
-    private AuthenticationProvider authenticationProvider;
-
-    @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     private JwtUserDetailsService userDetailService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
-        authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
-
-        final UserDetails userDetails = userDetailService.loadUserByUsername(authenticationRequest.getEmail());
-        final String token = jwtTokenUtil.generateToken(userDetails);
-
+        final Member member = userDetailService.authenticateByEmailAndPassword
+                (authenticationRequest.getEmail(), authenticationRequest.getPassword());
+        final String token = jwtTokenUtil.generateToken(member.getEmail());
         return ResponseEntity.ok(new JwtResponse(token));
     }
-
-    private void authenticate(String username, String password) throws Exception {
-        try {
-            authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(username,password));
-        } catch (DisabledException e) {
-            throw new Exception("USER_DISABLED", e);
-        } catch (BadCredentialsException e) {
-            throw new Exception("INVALID_CREDENTIALS", e);
-        }
-    }
-
 
 }
 
@@ -653,17 +614,33 @@ class JwtResponse {
 
 마지막으로 **JwtAuthenticationController** 실제 endpoint를 지정해주는 controller를 작성해준다.
 
-※ 블로그를 작성하다보니 authenticationProvider에서 findMember()를 사용하고 다시 아래 userDetailService에서 findMember()를 사용하는 부분이 있다. 이부분은 추후 리팩토링...
+# 확인하기
 
 
+
+1.사용자를 데이터베이스에 저장시킨다
+
+![20201012_133621](https://user-images.githubusercontent.com/30790184/95706008-9c2dc000-0c90-11eb-8f36-086031802780.png)
 
 <br>
 
-이렇게 구성하면 다음과같이 동작 가능하다
+2./authenticate 에 1번에서 등록한 email, password를 기반으로 token값을 얻어낸다.
+
+![20201012_134419](https://user-images.githubusercontent.com/30790184/95706171-11999080-0c91-11eb-8fac-7af2d67af2df.png)
+
+3.2번에서 얻어낸 토큰값으로 인증이 필요한 url에 접근한다.
+
+![20201012_133831](https://user-images.githubusercontent.com/30790184/95706002-9afc9300-0c90-11eb-819f-ef4ff524f2fd.png)
+
+4.인증되지 않은 토큰을 기반으로 접근할 경우 401 에러를 리턴시킨다.
+
+![20201012_133944](https://user-images.githubusercontent.com/30790184/95706006-9afc9300-0c90-11eb-8d86-ea1fc5618a91.png)
 
 
 
-![녹화_2020_03_05_16_00_01_846](https://user-images.githubusercontent.com/30790184/75956286-eaa8fe00-5efa-11ea-938b-d33e87a0c879.gif)
+
+
+
 
 
 
