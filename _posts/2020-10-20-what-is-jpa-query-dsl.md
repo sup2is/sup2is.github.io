@@ -2,7 +2,7 @@
 layout: post
 title: "QueryDSL JPA 알아보기 Feat.Spring Data"
 tags: [Spring Boot, JPA, QueryDSL]
-date: 2020-08-12
+date: 2020-10-20
 comments: true
 ---
 
