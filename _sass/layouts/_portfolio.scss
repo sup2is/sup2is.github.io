@@ -51,6 +51,21 @@
       background-color: $theme-dark;
     }
   }
+  #intro {
+    @extend %page-padding;
+    margin-bottom: 55px;
+    margin-top: 55px;
+    .title {
+      margin-top: 15px;
+      color: $theme-dark;
+      font-size: 25px;
+      font-weight: 600;
+    }
+    p.intro {
+      margin-left: 5px;
+      line-height: 1em;
+    }
+  }
   #career {
     @extend %page-padding;
     margin-bottom: 55px;

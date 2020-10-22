@@ -1,0 +1,48 @@
+- project :
+    print : True # If 'False' is selected, it will not be displayed in 'home.html > aside > .proj-content'. 
+    modal : True # If 'True' is selected, modal can open in 'portfolio.html'. 
+    url : https://github.com/sup2is/e-commerce-project # Full URL
+    image : "https://github.com/sup2is/e-commerce-project/raw/master/architecture.png" # path: assets/project/
+    date : 2020.08.13 - Developing
+    title : MSA 기반 e-commerce-project
+    description : 이커머스 핵심 기능을 MSA로 구현한 토이 프로젝트
+    contents :
+        - title : 1. 구현 목표
+          description :
+              <li>Spring Cloud를 사용해서 각 서비스를 개별적으로 분리하여 변화와 장애에 유연한 서비스를 설계하려고 노력했습니다.</li>
+              <li>MSA + Container기반 인프라 구성을 통해 수평적인 확장과 대용량 트래픽에 대응할 수 있는 설계를 구성하려고 노력했습니다.</li>
+              <li>테스트를 통해 코드의 품질을 향상시키려고 노력했고 별도의 api 문서 툴을 사용하지않고 spring 자체에서 지원하는 spring rest docs를 사용했습니다.</li>
+              <li>조영호님의 '객체지향의 사실과 오해' 라는 책에 입각하여 최대한 객체지향적으로 프로그래밍하려고 노력했고 일관성을 지키려고 노력했습니다.</li>
+        - title : 2. 사용 기술
+          description :
+            <li>Java 8</li>
+            <li>Spring Boot 2.3.1</li>
+            <li>Maven</li>
+            <li>Spring Cloud
+            </li>
+            <li>Docker &amp; Docker Compose</li>
+            <li>Junit</li>
+            <li>Intellij</li>
+            <li>Redis</li>
+            <li>Spring Data JPA</li>
+            <li>Spring Rest Docs</li>
+            <li>Jwt기반 인증</li>
+            <li>H2</li>
+            <li>Mysql</li>
+            <li>etc...</li>
+        - title : 3. 애플리케이션 요구사항
+          description :
+            <p><strong>회원</strong></p>
+            <li>회원가입</li>
+            <li>인증 모듈 with JWT</li>
+            <li>일반 고객 / 판매자 기능</li>
+            <p><strong>주문</strong></p>
+            <li>주문 등록 / 수정 / (일반회원)</li>
+            <li>주문 조회</li>
+            <p><strong>상품</strong></p>
+            <li>상품 등록 / 수정 /  (판매자)</li>
+            <li>상품 조회</li>
+            <li>상품 검색 (카테고리별, 이름 등등 다양한 옵션)</li>
+        - title : 4. 예상 아키텍쳐
+          image : https://github.com/sup2is/e-commerce-project/raw/master/architecture.png
+          

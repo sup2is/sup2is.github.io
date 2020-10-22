@@ -23,10 +23,29 @@ layout: page
     </div>
     <div class="bg"></div>
   </section>
+
+  <section id="intro" class="row">
+    <article class="col-12">
+      <p class="title">INTRODUCE 😊</p>
+      <p class="intro">
+        안녕하세요 저는 Junior Java Developer 최현섭입니다. 약 2년동안 웹 서비스 회사에서 근무한 이력이 있습니다.
+      </p>
+      <p class="intro">
+        - 반복되는 일을 자동화하고 비효율적인 프로세스가 있다면 점진적으로 개선해 나가는 일을 해본 경험이 있습니다.
+      </p>
+      <p class="intro">
+        - 새로운 기술을 배우고 실제 업무에 적용시키는 일에 흥미를 느낍니다.
+      </p>
+      <p class="intro">
+        - 객체지향 프로그래밍을 좋아합니다. 항상 객체 인터페이스를 기반으로 코딩하기 위해 노력하고 객체 역할 분담에 대해서 고민합니다.
+      </p>
+    </article>
+  </section>
+
   <!-- career section -->
   <section id="career" class="row">
     <article class="exper col-12 col-md-6">
-      <p class="title">EXPERIENCE</p>
+      <p class="title">EXPERIENCE 📄</p>
       <ul class="exper-list">
         {% for exp in  profile.experience %}
         <li class="meta">
@@ -37,7 +56,7 @@ layout: page
       </ul>
     </article>
     <article class="skills col-12 col-md-6">
-      <p class="title">SKILLS</p>
+      <p class="title">SKILLS 🔨</p>
       <ul class="skill-list">
         {% for _ in profile.skills %}
         <li class="skill">
@@ -53,5 +72,6 @@ layout: page
     </article>
   </section>
 
-  {% include projects.html %}
+{% include projects.html %}
+
 </div>
