@@ -42,11 +42,60 @@ comments: true
 - **REPEATABLE READ:** 한 번 조회한 데이터를 반복해서 조회해도 같은 데이터가 조회됨 하지만 PHANTOM READ는 발생할 수 있음 예를 들어 트랜잭션 1이 10살 이하의 회원을 조회했는데 트랜잭션 2가 5살 회원을 추가하고 커밋하면 트랜잭션 1이 다시 10살 이하의 회원을 조회했을때 회원 하나가 추가된 상태로 조회됨
 - **SERIALIZABLE:** 가장 엄격한 트랜잭션 격리 수준, 동시성 처리 성능이 급격히 떨어질 수 있음
 
+<br>
+
+> **Spring에서 @Transactional 애너테이션에 트랜잭션 격리 수준을 지정하는 방법**
+>
+> ```java
+> @Transactional(isolation = Isolation.READ_COMMITTED)
+> 
+> ...
+>     
+> package org.springframework.transaction.annotation;
+> 
+> public enum Isolation {
+>     DEFAULT(-1),
+>     READ_UNCOMMITTED(1),
+>     READ_COMMITTED(2),
+>     REPEATABLE_READ(4),
+>     SERIALIZABLE(8);
+> 
+>     private final int value;
+> 
+>     private Isolation(int value) {
+>         this.value = value;
+>     }
+> 
+>     public int value() {
+>         return this.value;
+>     }
+> }
+> 
+> 
+> ```
+
+
+
+<br>
+
 # JPA 낙관적락과 비관적락
 
 ## 낙관적 락
 
 - JPA 낙관적 락은 @Version 이라는 version을 사용함
+
+> ```java
+> @Entity 
+> public class Member { 
+>     @Id @GeneratedValue(strategy = GenerationType.AUTO) 
+>     @Column(name = "member_id")
+>     private Long Id; 
+> 
+>     @Version 
+>     private int version; 
+> }
+> ```
+
 - 낙관적 락은 트랜잭션을 커밋하는 시점에서 충돌을 알 수 있다는 특징이 있음
 - 낙관적 락 옵션에 따른 효과
 
