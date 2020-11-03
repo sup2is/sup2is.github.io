@@ -298,6 +298,6 @@ java의 `synchronized`는 Monitor를 이용해 Thread의 동기화를 보장한�
 **References**
 
 - [https://www.baeldung.com/java-synchronized](https://www.baeldung.com/java-synchronized)
-- https://www.baeldung.com/java-testing-multithreaded
+- [https://www.baeldung.com/java-testing-multithreaded](https://www.baeldung.com/java-testing-multithreaded)
 - [https://www.linkedin.com/pulse/static-variables-methods-java-where-jvm-stores-them-kotlin-malisciuc](https://www.linkedin.com/pulse/static-variables-methods-java-where-jvm-stores-them-kotlin-malisciuc)
 - [https://www.kdata.or.kr/info/info_04_view.html?field=&keyword=&type=techreport&page=18&dbnum=183741&mode=detail&type=techreport](https://www.kdata.or.kr/info/info_04_view.html?field=&keyword=&type=techreport&page=18&dbnum=183741&mode=detail&type=techreport)
