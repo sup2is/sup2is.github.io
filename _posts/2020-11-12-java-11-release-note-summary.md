@@ -2,7 +2,7 @@
 layout: post
 title: "Java11에서 추가된 주요 기능 알아보기"
 tags: [Java, Java 11]
-date: 2020-11-02
+date: 2020-11-12
 comments: true
 ---
 
