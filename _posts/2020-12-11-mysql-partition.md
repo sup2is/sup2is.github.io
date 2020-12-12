@@ -104,7 +104,6 @@ ALTER TABLE logs
 ALTER TABLE employees DROP PARTITION log_2021;
 ```
 
-### 
 
 ### 레인지 파티션의 주의사항
 
@@ -166,7 +165,7 @@ PARTITION BY LIST (category_id) (
 
 해시 파티션은 다음과 같이 생성할 수 있다.
 
-```SQL
+```sql
 CREATE TABLE member (
     member_id INT NOT NULL,
     name VARCHAR(10) NOT NULL,
@@ -202,7 +201,7 @@ PARTITIONS 4 (
 
 ### 키 파티션의 생성
 
-```SQL
+```sql
 CREATE TABLE member2 (
     member_id INT NOT NULL,
     name VARCHAR(10) NOT NULL,
