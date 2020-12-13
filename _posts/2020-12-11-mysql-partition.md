@@ -71,6 +71,10 @@ PARTITION BY RANGE (YEAR (reg_date)) (
 
 
 
+![1564389258F05B893DBB2CE941B4CB46_img_760](https://user-images.githubusercontent.com/30790184/102008245-8ca32400-3d72-11eb-9c6c-064cc6d9b5bb.jpg)
+
+
+
 ### 레인지 파티션의 추가 및 분리와 병합
 
 MAXVALUE 파티션이 정의되지 않았을 경우 아래와 같이 단순하게 파티션을 추가할 수 있다.
