@@ -34,7 +34,7 @@ color:#41706f;
 }
 
 .highlight .c1 {
-color:#bbb529;
+color:#808080;
 }
 
 .highlight .py {
@@ -160,21 +160,34 @@ font-weight:700;
 color:#00cd00;
 }
 
-.highlight .ld,.preview-zenburn .highlight .s,.preview-zenburn .highlight .sb,.preview-zenburn .highlight .sc,.preview-zenburn .highlight .sd,.preview-zenburn .highlight .s2,.preview-zenburn .highlight .se,.preview-zenburn .highlight .sh,.preview-zenburn .highlight .si,.preview-zenburn .highlight .sx,.preview-zenburn .highlight .sr,.preview-zenburn .highlight .s1,.preview-zenburn .highlight .ss {
+.highlight .ld,.preview-zenburn ,.preview-zenburn .highlight .sb,.preview-zenburn .highlight .sc,.preview-zenburn .highlight .sd,.preview-zenburn .highlight .s2,.preview-zenburn .highlight .se,.preview-zenburn .highlight .sh,.preview-zenburn .highlight .si,.preview-zenburn .highlight .sx,.preview-zenburn .highlight .sr,.preview-zenburn .highlight .s1,.preview-zenburn .highlight .ss {
 color:#cc9393;
 }
 
-.highlight .m,.preview-zenburn .highlight .mf,.preview-zenburn .highlight .mh,.preview-zenburn .highlight .mi,.preview-zenburn .highlight .mo,.preview-zenburn .highlight .il {
+.highlight .m,.preview-zenburn .highlight .mf,.preview-zenburn .highlight .mh,.preview-zenburn ,.preview-zenburn .highlight .mo,.preview-zenburn .highlight .il {
 color:#8cd0d3;
 }
 
-.highlight .na, .preview-zenburn .highlight .nt {
+.preview-zenburn .highlight .nt {
 color:#9ac39f;
 }
 
-.highlight .nb,.preview-zenburn .highlight .nc,.preview-zenburn .highlight .nf,.preview-zenburn .highlight .bp,.preview-zenburn .highlight .vc {
+.highlight .nb,.preview-zenburn .highlight .nc,.preview-zenburn ,.preview-zenburn .highlight .bp,.preview-zenburn .highlight .vc {
 color:#efef8f;
 }
+
+.highlight .mi{
+color:#5c96ba;
+}
+
+.highlight .s{
+color:#617b4b;
+}
+
+.highlight .nf {
+color:#ffc76d;	
+}
+
 
 
 // add style
