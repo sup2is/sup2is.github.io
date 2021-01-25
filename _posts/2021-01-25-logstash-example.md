@@ -2,7 +2,7 @@
 layout: post
 title: "Logstash 시작하기 Feat. Filebeat"
 tags: [Logstash, FileBeat]
-date: 2021-1-19
+date: 2021-1-25
 comments: true
 ---
 
@@ -234,4 +234,4 @@ Logstash가 문제없이 잘 동작한다면 Filebeat를 다음 명령어로 실
 
 **References**
 
-- [https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-elasticsearch-on-ubuntu-20-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-elasticsearch-on-ubuntu-20-04)
+- [https://www.elastic.co/guide/en/logstash/7.10/getting-started-with-logstash.html](https://www.elastic.co/guide/en/logstash/7.10/getting-started-with-logstash.html)
