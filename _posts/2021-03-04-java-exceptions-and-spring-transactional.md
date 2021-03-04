@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Java의 Exception 그리고 Spring의 \@Transactional"
-tags: [Java, Spring, Exception, CheckedException, UnCheckedException, \@Transactional]
+title: "Java의 Exception 그리고 Spring의 @Transactional"
+tags: [Java, Spring, Exception, CheckedException, UnCheckedException, Transactional]
 date: 2021-03-04
 comments: true
 ---
@@ -49,8 +49,6 @@ comments: true
 `CheckedExecption`은 Java 컴파일러가 처리해야 하는 예외이다. `throw` 키워드를 사용해서 선언적으로 예외를 던지거나 `try-catch` 형태로 예외를 직접 처리해야 한다는 의미이다. Java에서 `CheckedExecption`은 대부분 `Exception` 클래스를 상속하는 클래스들이고 사용하는  대표적으로 `IOException`, `ServletException` 등이 있다. 
 
 `Exception`클래스를 상속받는 다양한 `CheckedExecption`은 [https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Exception.html](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Exception.html)에서 직접 확인할 수 있다.
-
-이 `CheckedExecption`은 클라이언트가 예외에서 복구할 것으로 예측할수 있을때 사용하기 적합한 Exception 타입이다.
 
 이 `CheckedExecption`은 클라이언트가 예외를 직접 처리하고 예외를 복구할 것으로 예측할수 있을때 사용하기 적합한 Exception 타입이다.
 
