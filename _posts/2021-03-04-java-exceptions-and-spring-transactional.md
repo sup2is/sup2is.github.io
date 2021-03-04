@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Java의 Exception 그리고 Spring의 @Transactional"
-tags: [Java, Spring, Exception, CheckedException, UnCheckedException, @Transactional]
+title: "Java의 Exception 그리고 Spring의 \@Transactional"
+tags: [Java, Spring, Exception, CheckedException, UnCheckedException, \@Transactional]
 date: 2021-03-04
 comments: true
 ---
