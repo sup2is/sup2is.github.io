@@ -502,7 +502,7 @@ break 걸어 메서드 콜 스택을 확인해보면 결과적으로 `Transactio
 ![20210304_122537](https://user-images.githubusercontent.com/30790184/109907310-6348c300-7ce5-11eb-8d97-0d6b831d8bb5.png)
 ![20210304_122518](https://user-images.githubusercontent.com/30790184/109907311-6348c300-7ce5-11eb-9bcc-445ef12a6c98.png)
 
-**결론적으로 ``@Transactional(rollbackFor = DataFormatException.class)`을 사용하면 DataFormatException 을 throw 했을때 롤백이 된다.**
+**결론적으로 `@Transactional(rollbackFor = DataFormatException.class)`을 사용하면 DataFormatException 을 throw 했을때 롤백이 된다.**
 
 # 마무리
 
@@ -517,6 +517,8 @@ break 걸어 메서드 콜 스택을 확인해보면 결과적으로 `Transactio
 ***
 
 포스팅은 여기까지 하겠습니다. 퍼가실때는 출처를 반드시 남겨주세요!
+
+예제: [https://github.com/sup2is/study/tree/master/spring/spring-transaction-and-exception-example](https://github.com/sup2is/study/tree/master/spring/spring-transaction-and-exception-example)
 
 <br>
 
