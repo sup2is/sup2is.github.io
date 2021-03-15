@@ -25,13 +25,13 @@ theme_settings :
         value : 80  # Percent value
       - skill : Database
         value : 60  # Percent value
-      - skill : Vue
-        value : 50  # Percent value
       - skill : HTML5 & CSS3 & JQuery
         value : 50  # Percent value
       - skill : Javascript
         value : 30  # Percent value
       - skill : NoSQL
+        value : 30  # Percent value
+      - skill : Vue
         value : 30  # Percent value
 
 
