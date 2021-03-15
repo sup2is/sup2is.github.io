@@ -4,7 +4,7 @@ url : "https://sup2is.github.io"
 
 # Blog Settings
 theme_settings :
-  title : Sup2is blog
+  title : Sup2's blog
   favicon : ./favicon.ico
 
   # Profile Settings
@@ -23,17 +23,15 @@ theme_settings :
         value : 80  # Percent value
       - skill : Spring
         value : 80  # Percent value
-      - skill : Kafka
+      - skill : Database
         value : 60  # Percent value
-      - skill : Redis
-        value : 60  # Percent value
-      - skill : SQL
-        value : 50  # Percent value
       - skill : Vue
         value : 50  # Percent value
-      - skill : HTML & CSS3
+      - skill : HTML5 & CSS3 & JQuery
+        value : 50  # Percent value
+      - skill : Javascript
         value : 30  # Percent value
-      - skill : JavaScript
+      - skill : NoSQL
         value : 30  # Percent value
 
 
