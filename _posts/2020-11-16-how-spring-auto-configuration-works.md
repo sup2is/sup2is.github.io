@@ -27,7 +27,7 @@ public @interface SpringBootApplication { ... }
 
 `@EnableAutoConfiguration` 애너테이션을 사용하면 classpath를 스캔해서 Spring `ApplicationContext` 의 auto-configuration을 활성화하고 Conditions에 해당하는 bean들을 등록시켜준다.
 
-그럼 Spring `ApplicationContext` 의 auto-configuration은 어디에 있을지 생각해볼만한데 `org.springframework.boot.autoconfigure` 패키지 내부를 확인해보면 100개 이상의 익숙한 AutoConfiguration 클래스들을 확인할 수 있다.
+그럼 Spring `ApplicationContext` 의 auto-configuration은 어디에 있을지 생각해볼만한데 `org.springframework.boot.autoconfigure` 패키지 내부를 확인해보면 100개 이상의 익숙한 AutoConfiguration 클래스들을 확인할 수 있다. 실제 auto-configuration 목록은 [spring.factories](https://github.com/spring-projects/spring-boot/blob/v2.0.0.M3/spring-boot-autoconfigure/src/main/resources/META-INF/spring.factories)파일에서 확인할 수 있다.
 
 ![20201113_142151](https://user-images.githubusercontent.com/30790184/99200409-78f2b500-27e8-11eb-9f97-db8a52b396cd.png)
 
