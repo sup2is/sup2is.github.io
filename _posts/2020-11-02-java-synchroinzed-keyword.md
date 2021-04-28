@@ -275,6 +275,63 @@ java의 static 키워드의 특징 상 JVM 힙의 Metaspace에 저장된다. 이
     }
 ```
 
+> 20210428 추가내용
+
+synchronized 블록을 사용함으로써 클라이언트 레벨로 명시적인 모니터 락을 얻어낼 수 있다.
+
+```java
+public class PrivateLock {
+    private final Object myLock = new Object();
+    @GuardedBy("myLock") Widget widget;
+
+    void someMethod() {
+        synchronized (myLock) {
+            // Access or modify the state of widget
+        }
+    }
+}
+```
+
+위 코드는 자바병렬프로그래밍 책에서 클라이언트 락을 사용하여 자바 모니터 패턴을 구현한 예제이다. 위와 같은 형태로 사용하면 myLock이라는 객체에 대한 락을 얻어낼 수 있다. 
+
+비슷한 예제로
+
+```java
+public class UnsafeVectorHelpers {
+    public static Object getLast(Vector list) {
+        int lastIndex = list.size() - 1;
+        return list.get(lastIndex);
+    }
+
+    public static void deleteLast(Vector list) {
+        int lastIndex = list.size() - 1;
+        list.remove(lastIndex);
+    }
+}
+```
+
+위와 같은 코드는 list.size()를 얻어내는 시점이 다르기때문에 Vector가 Thread-Safe하더라도 멀티스레드 환경에서는 문제가 생길 수 있는 코드이다.
+
+이런 경우에 명시적인 클라이언트 락을 얻어내면 넘어온 인스턴스 자체의 lock을 걸기때문에 두 개 이상의 스레드가 저 synchronized 블록을 실행할 수 없게되어 문제가 생기지 않는다.
+
+```java
+public class SafeVectorHelpers {
+    public static Object getLast(Vector list) {
+        synchronized (list) {
+            int lastIndex = list.size() - 1;
+            return list.get(lastIndex);
+        }
+    }
+
+    public static void deleteLast(Vector list) {
+        synchronized (list) {
+            int lastIndex = list.size() - 1;
+            list.remove(lastIndex);
+        }
+    }
+}
+```
+
 # synchronized와 Moniter
 
 java의 `synchronized`는 Monitor를 이용해 Thread의 동기화를 보장한다. 모든 객체는 하나의 Monitor를 가지고 있고 Monitor는 하나의 Thread만을 소유할 수 있다. Monitor를 소유하고 있는 Thread가 Monitor를 해제할 때까지 Wait Queue에서 대기해야 한다. 관련해서 [https://www.kdata.or.kr/info/info_04_view.html?field=&keyword=&type=techreport&page=18&dbnum=183741&mode=detail&type=techreport](https://www.kdata.or.kr/info/info_04_view.html?field=&keyword=&type=techreport&page=18&dbnum=183741&mode=detail&type=techreport) 이 글을 읽어보면 도움이 될 수 있다.
@@ -301,3 +358,4 @@ java의 `synchronized`는 Monitor를 이용해 Thread의 동기화를 보장한�
 - [https://www.baeldung.com/java-testing-multithreaded](https://www.baeldung.com/java-testing-multithreaded)
 - [https://www.linkedin.com/pulse/static-variables-methods-java-where-jvm-stores-them-kotlin-malisciuc](https://www.linkedin.com/pulse/static-variables-methods-java-where-jvm-stores-them-kotlin-malisciuc)
 - [https://www.kdata.or.kr/info/info_04_view.html?field=&keyword=&type=techreport&page=18&dbnum=183741&mode=detail&type=techreport](https://www.kdata.or.kr/info/info_04_view.html?field=&keyword=&type=techreport&page=18&dbnum=183741&mode=detail&type=techreport)
+- 자바 병렬 프로그래밍(에이콘)
