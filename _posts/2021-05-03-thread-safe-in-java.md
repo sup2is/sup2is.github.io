@@ -125,13 +125,13 @@ public class PrivateLock {
     
 ```
 
-`get()`, `put()` 등등 주요 메서드들이 전부 `synchronized` 키워드에 감싸진 상태로 동시성을 보장하고 있다. 그말인즉슨 `Hashtable`의 인스턴스 메서드를 호출할 수 있는 스레드는 반드시 1개라는 뜻이다.
+`get()`, `put()` 등등 주요 메서드들이 전부 `synchronized` 키워드에 감싸진 상태로 동시성을 보장하고 있다. 그말인즉슨 `Hashtable`의 동기화된 인스턴스 메서드를 호출할 수 있는 스레드는 반드시 1개라는 뜻이다. 동시에 호출이 불가능하다.
 
 자바는 `Hashtable` 의 성능을 조금 더 증진시키기 위해 1.5 버전에서 `ConcurrentHashMap`을 도입했다. `ConcurrentHashMap`은 조금 더 세밀하게 동시성을 보장하기 때문에 더 좋은 성능을 보장한다.
 
-![ConcurrentHashMapScalability](https://user-images.githubusercontent.com/30790184/116836708-8cf96a00-ac02-11eb-960f-568ef52c2dc3.png)
+![thread-safe-map-performance-benchmark1](https://user-images.githubusercontent.com/30790184/116840588-5aa33900-ac11-11eb-9daf-2922a66c57a7.png)
 
-> https://www.javamex.com/tutorials/concurrenthashmap_scalability.shtml
+> http://asjava.com/core-java/thread-safe-hash-map-in-java-and-their-performance-benchmark/
 
 다음은 `ConcurrentHashMap`의 주요 메서드이다. `Hashtable`과는 달리 `get()` 또는 `put()` 메서드에 `synchronized` 키워드가 없다.
 
@@ -229,6 +229,8 @@ public class PrivateLock {
     }
         
 ```
+
+`get()`메서드의 경우 `volatile` 변수를 사용해서 가시성을 보장하도록 되어있고 `put()` 메서드는 부분적으로 `synchronized` 키워드를 사용하는것을 볼 수 있다.
 
 `ConcurrentHashMap`에 대한 정리글은 [https://pplenty.tistory.com/17](https://pplenty.tistory.com/17) 여기에서 확인할 수 있다.
 
@@ -399,3 +401,4 @@ public final class ImmutableClass
 - [https://blog.e-zest.com/java-monitor-pattern/](https://blog.e-zest.com/java-monitor-pattern/)
 - [https://howtodoinjava.com/java/basics/how-to-make-a-java-class-immutable/](https://howtodoinjava.com/java/basics/how-to-make-a-java-class-immutable/)
 - [https://pplenty.tistory.com/17](https://pplenty.tistory.com/17)
+- [https://javacan.tistory.com/entry/ThreadLocalUsage](https://javacan.tistory.com/entry/ThreadLocalUsage)
