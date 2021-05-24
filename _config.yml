@@ -18,6 +18,7 @@ theme_settings :
         experience : Paycoms - Java Backend Developer
       - start : 2020-05-06
         experience : ESTGames - Java Backend Developer
+        end : 2021-05-14
     skills : 
       - skill : Java
         value : 80  # Percent value
