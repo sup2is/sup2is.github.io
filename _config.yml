@@ -19,6 +19,8 @@ theme_settings :
       - start : 2020-05-06
         experience : ESTGames - Java Backend Developer
         end : 2021-05-14
+      - start : 2021-05-31
+        experience : 42dot - Java Backend Developer
     skills : 
       - skill : Java
         value : 80  # Percent value
