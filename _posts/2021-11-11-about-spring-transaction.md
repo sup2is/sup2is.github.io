@@ -2,7 +2,7 @@
 layout: post
 title: "Spring의 선언적 트랜잭션 Feat.Spring Boot"
 tags: [Spring Boot, Transaction]
-date: 2021-11-10
+date: 2021-11-11
 comments: true
 ---
 
@@ -53,7 +53,7 @@ public interface PlatformTransactionManager extends TransactionManager {
 
 `AbstractPlatformTransactionManager`는 추상클래스이고 `PlatformTransactionManager` 에서 제공하는 세가지 메서드를 전부 구현하고 있다. `getTransaction()` 메서드만 살펴보면 아래와 같은 형태로 구현되어 있다.
 
-`PlatformTransactionManager.getTransaction()`
+`AbstractPlatformTransactionManager.getTransaction()`
 
 ```java
 @Override
@@ -63,7 +63,7 @@ public final TransactionStatus getTransaction(@Nullable TransactionDefinition de
    // Use defaults if no transaction definition given.
    TransactionDefinition def = (definition != null ? definition : TransactionDefinition.withDefaults());
 
-   Object transaction = doGetTransaction(); // <- 요기
+   Object transaction = doGetTransaction();
    boolean debugEnabled = logger.isDebugEnabled();
 
    if (isExistingTransaction(transaction)) {
@@ -118,7 +118,7 @@ public final TransactionStatus getTransaction(@Nullable TransactionDefinition de
 protected abstract Object doGetTransaction() throws TransactionException;
 ```
 
-`AbstractPlatformTransactionManager` 을 상속받으면 `doGetTransaction()` 을 구현함으로써 어느정도 추상화되어있는 `getTransaction()` 메서드를 손쉽게 사용할 수 있는 템플릿 메서드 패턴이다.  `PlatformTransactionManager` 의 `commit()`, `rollback()` 도 같은 형태로 동작한다.
+`AbstractPlatformTransactionManager` 을 상속받으면 `doGetTransaction()` 을 구현함으로써 추상화되어있는 `getTransaction()` 메서드에 어느정도 기본적인 구조를 재활용함과 동시에 구현체별로 다른 동작을 할 수 있도록 도와주는 템플릿 메서드 패턴을 사용할 수 있다.  `PlatformTransactionManager` 의 `commit()`, `rollback()` 도 같은 형태로 동작한다.
 
 `AbstractPlatformTransactionManager`의 구현체중 가장 대표적인 `DataSourceTransactionManager` 를 살펴보면 아래와 같이 `doGetTransaction()` 의 구현을 확인할 수 있다
 
@@ -175,6 +175,10 @@ protected abstract Object doGetTransaction() throws TransactionException;
 
 ```
 
+`DataSourceTransactionManager` 외에도 다양한 구현체가 있으니 [docs](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/transaction/support/AbstractPlatformTransactionManager.html) 를 직접확인해보면 된다.
+
+
+
 # TransactionStatus
 
 `PlatformTransactionManager`의 `getTransaction()` 메서드는 `TransactionStatus` 타입을 리턴하도록 되어있다. 
@@ -206,7 +210,7 @@ nullable하지만 transaction 오브젝트를 포함하여 여러 필드를 받�
 
 `TransactionDefinintion` 는 트랜잭션 속성을 정의하는 인터페이스이다. 여기에서 트랜잭션 전파속성, 격리수준, timeout 시간, readonly 에 대한 속성을 정의할 수 있다.
 
-기본 구현체인 DefaultTransactionAttribute를 사용하는데 DefaultTransactionAttribute 의 생성자를 살펴보면 아래와 같이 되어있다.
+기본 구현체인 `DefaultTransactionAttribute`를 사용하는데 `DefaultTransactionAttribute` 의 생성자를 살펴보면 아래와 같이 되어있다.
 
 `DefaultTransactionDefinition의 생성자들과 초기화 필드`
 
@@ -258,25 +262,44 @@ nullable하지만 transaction 오브젝트를 포함하여 여러 필드를 받�
 
 
 
-사실상 `DefaultTransactionDefinition` 을 직접적으로 사용하는 부분은 거의 없고 `TransactionAttribute` 라는 인터페이스와 함께 사용된다
+사실상 `DefaultTransactionDefinition` 을 직접적으로 사용하는 부분은 거의 없고 `TransactionAttribute` 라는 인터페이스와 함께 사용되기 때문에 `TransactionAttribute` 도 같이 보는게 좋다.
 
 # TransactionAttribute
 
 `TransactionAttribute` 은 `TransactionDefinition` 에 `rollbackOn()` 이라는 메서드를 추가해서 사용하기 위해 존재하는 인터페이스이다.
 
-`rollbackOn()` 이라는 속성 자체가 Spring AOP에만 사용되는 개념이기 때문에? `TransactionDefinition`을 새롭게 확장해서 사용하는 것 같다
+`rollbackOn()` 이라는 속성 자체가 Spring AOP에만 사용되는 개념이기 때문에? `TransactionDefinition`을 새롭게 확장해서 사용하는 것 같다.
 
-기본 구현체인 `DefaultTransactionAttribute` 의 `rollbackOn()` 메서드를 확인해보면 많이 알고 있는 내용인 unchecked 예외만 롤백하는 모습을 확인할 수 있다.
+`DefaultTransactionAttribute 클래스`
 
 ```java
+
+public interface TransactionAttribute extends TransactionDefinition {
+
+	@Nullable
+	String getQualifier();
+
+	Collection<String> getLabels();
+
+	boolean rollbackOn(Throwable ex);
+
+}
+
+public class DefaultTransactionAttribute extends DefaultTransactionDefinition implements TransactionAttribute {
+
+	...
+    
 	@Override
 	public boolean rollbackOn(Throwable ex) {
 		return (ex instanceof RuntimeException || ex instanceof Error);
 	}
-
+   
+}
 ```
 
-이 `DefaultTransactionAttribute` 마저도 직접적으로 사용되지는 않고 한단계 저수준인 `RuleBasedTransactionAttribute`을 사용한다
+기본 구현체인 `DefaultTransactionAttribute` 의 `rollbackOn()` 메서드를 확인해보면 많이 알고 있는 내용인 unchecked 예외만 롤백하는 모습을 확인할 수 있다.
+
+이 `DefaultTransactionAttribute` 마저도 직접적으로 잘 사용되지는 않고 않고 한단계 저수준인 `RuleBasedTransactionAttribute`을 사용하는 것 같다.
 
 `RuleBasedTransactionAttribute.rollbackOn()`
 
@@ -324,7 +347,9 @@ public boolean rollbackOn(Throwable ex) {
 
 Spring은 `TransactionInterceptor`를 통해 트랜잭션 Aspect를 설정하는데 `TransactionAspectSupport`는 `TransactionInterceptor`의 기본이되는 기본 Aspect 클래스다.
 
-`TransactionAspectSupport` 는 추상클래스이지만 추상메서드가 없기때문에 실제 구현체인 `TransactionInterceptor` 를 보는게 맞을 수 있지만 사실 `TransactionInterceptor` 의 구현은 별로 중요하지 않고 `MethodInterceptor` 의 `invoke()` 메서드를 구현하기 위해 존재한다 라고 생각하면 편하다
+`TransactionAspectSupport` 는 추상클래스이기 때문에 실제 구현체인 `TransactionInterceptor` 를 보는게 맞을 수 있지만 사실 `TransactionAspectSupport` 에는 추상 메서드가 없는 형태로 되어있다.
+
+그리고 `TransactionInterceptor`  의 역할은 `MethodInterceptor` 의 `invoke()` 메서드를 구현해서 Spring 기본 트랜잭션 API와 통합하게 해주는 역할을 한다고 생각하면 된다.
 
 `TransactionAspectSupport` 의 주요 메서드인 `invokeWithinTransaction()` 를 살펴보면 큰 단락에서 `CallbackPreferringPlatformTransactionManager`이나 `ReactiveTransactionManager`이 아니라면 `AbstractPlatformTransactionManager.getTransaction()`  메서드를 호출해서 트랜잭션을 시작하고 에러가 났을 때는 `rollback()`, 정상적일때는 `commit()` 시키는 로직을 확인할 수 있다.
 
@@ -394,7 +419,7 @@ public class TransactionAutoConfiguration {
 	public static class EnableTransactionManagementConfiguration {
 
 		@Configuration(proxyBeanMethods = false)
-		@EnableTransactionManagement(proxyTargetClass = false)
+		@EnableTransactionManagement(proxyTargetClass = false) // <- 요기
 		@ConditionalOnProperty(prefix = "spring.aop", name = "proxy-target-class", havingValue = "false",
 				matchIfMissing = false)
 		public static class JdkDynamicAutoProxyConfiguration {
@@ -402,7 +427,7 @@ public class TransactionAutoConfiguration {
 		}
 
 		@Configuration(proxyBeanMethods = false)
-		@EnableTransactionManagement(proxyTargetClass = true)
+		@EnableTransactionManagement(proxyTargetClass = true) // <- 요기
 		@ConditionalOnProperty(prefix = "spring.aop", name = "proxy-target-class", havingValue = "true",
 				matchIfMissing = true)
 		public static class CglibAutoProxyConfiguration {
@@ -436,7 +461,9 @@ public @interface EnableTransactionManagement {
 
 ```
 
-`@EnableTransactionManagement` 는 `TransactionManagementConfigurationSelector` 를 import 하고 있고  `AdviceMode.PROXY` 가 기본값으로 설정되어 있기 때문에 아래 코드에서 `ProxyTransactionManagementConfiguration ` 설정이 로드된다.
+`@EnableTransactionManagement` 는 `TransactionManagementConfigurationSelector` 를 import 하고 있고  `AdviceMode.PROXY` 가 기본값으로 설정되어 있기 때문에 결론적으로 아래 `ProxyTransactionManagementConfiguration ` 설정이 로드된다.
+
+`TransactionManagementConfigurationSelector`
 
 ```java
 public class TransactionManagementConfigurationSelector extends AdviceModeImportSelector<EnableTransactionManagement> {
@@ -464,13 +491,178 @@ public class TransactionManagementConfigurationSelector extends AdviceModeImport
 
 ```
 
-결론적으로
+
+
+`ProxyTransactionManagementConfiguration`
+
+```java
+@Configuration(proxyBeanMethods = false)
+@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+public class ProxyTransactionManagementConfiguration extends AbstractTransactionManagementConfiguration {
+
+	@Bean(name = TransactionManagementConfigUtils.TRANSACTION_ADVISOR_BEAN_NAME)
+	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+	public BeanFactoryTransactionAttributeSourceAdvisor transactionAdvisor(
+			TransactionAttributeSource transactionAttributeSource, TransactionInterceptor transactionInterceptor) {
+
+		BeanFactoryTransactionAttributeSourceAdvisor advisor = new BeanFactoryTransactionAttributeSourceAdvisor();
+		advisor.setTransactionAttributeSource(transactionAttributeSource);
+		advisor.setAdvice(transactionInterceptor);
+		if (this.enableTx != null) {
+			advisor.setOrder(this.enableTx.<Integer>getNumber("order"));
+		}
+		return advisor;
+	}
+
+	@Bean
+	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+	public TransactionAttributeSource transactionAttributeSource() {
+		return new AnnotationTransactionAttributeSource();
+	}
+
+	@Bean
+	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+	public TransactionInterceptor transactionInterceptor(TransactionAttributeSource transactionAttributeSource) {
+		TransactionInterceptor interceptor = new TransactionInterceptor();
+		interceptor.setTransactionAttributeSource(transactionAttributeSource);
+		if (this.txManager != null) {
+			interceptor.setTransactionManager(this.txManager);
+		}
+		return interceptor;
+	}
+
+}
+```
+
+`ProxyTransactionManagementConfiguration` 에서는 트랜잭션 경계를 담당하는 `TransactionInterceptor`도 설정하는 모습도 확인할 수 있고 `AnnotationTransactionAttributeSource` 도 만드는데 이때 `SpringTransactionAnnotationParser` 가 등록된다.
+
+`SpringTransactionAnnotationParser`
+
+```java
+public class SpringTransactionAnnotationParser implements TransactionAnnotationParser, Serializable {
+
+   @Override
+   public boolean isCandidateClass(Class<?> targetClass) {
+      return AnnotationUtils.isCandidateClass(targetClass, Transactional.class);
+   }
+
+   @Override
+   @Nullable
+   public TransactionAttribute parseTransactionAnnotation(AnnotatedElement element) {
+      AnnotationAttributes attributes = AnnotatedElementUtils.findMergedAnnotationAttributes(
+            element, Transactional.class, false, false);
+      if (attributes != null) {
+         return parseTransactionAnnotation(attributes);
+      }
+      else {
+         return null;
+      }
+   }
+
+   public TransactionAttribute parseTransactionAnnotation(Transactional ann) {
+      return parseTransactionAnnotation(AnnotationUtils.getAnnotationAttributes(ann, false, false));
+   }
+
+   protected TransactionAttribute parseTransactionAnnotation(AnnotationAttributes attributes) {
+      RuleBasedTransactionAttribute rbta = new RuleBasedTransactionAttribute();
+
+      Propagation propagation = attributes.getEnum("propagation");
+      rbta.setPropagationBehavior(propagation.value());
+      Isolation isolation = attributes.getEnum("isolation");
+      rbta.setIsolationLevel(isolation.value());
+
+      rbta.setTimeout(attributes.getNumber("timeout").intValue());
+      String timeoutString = attributes.getString("timeoutString");
+      Assert.isTrue(!StringUtils.hasText(timeoutString) || rbta.getTimeout() < 0,
+            "Specify 'timeout' or 'timeoutString', not both");
+      rbta.setTimeoutString(timeoutString);
+
+      rbta.setReadOnly(attributes.getBoolean("readOnly"));
+      rbta.setQualifier(attributes.getString("value"));
+      rbta.setLabels(Arrays.asList(attributes.getStringArray("label")));
+
+      List<RollbackRuleAttribute> rollbackRules = new ArrayList<>();
+      for (Class<?> rbRule : attributes.getClassArray("rollbackFor")) {
+         rollbackRules.add(new RollbackRuleAttribute(rbRule));
+      }
+      for (String rbRule : attributes.getStringArray("rollbackForClassName")) {
+         rollbackRules.add(new RollbackRuleAttribute(rbRule));
+      }
+      for (Class<?> rbRule : attributes.getClassArray("noRollbackFor")) {
+         rollbackRules.add(new NoRollbackRuleAttribute(rbRule));
+      }
+      for (String rbRule : attributes.getStringArray("noRollbackForClassName")) {
+         rollbackRules.add(new NoRollbackRuleAttribute(rbRule));
+      }
+      rbta.setRollbackRules(rollbackRules);
+
+      return rbta;
+   }
+
+
+  ...
+
+}
+```
+
+`SpringTransactionAnnotationParser` 에서 `@Transactional`에 정의된 속성들을 파싱하는 역할을 한다.
+
+그 외에도 `AopUtils`, `TransactionAttributeSourcePointcut` `AbstractFallbackTransactionAttributeSource`  클래스 등등을 사용해서 최종적으로 `AbstractAutoProxyCreator` 이라는 빈 후처리기에 의해 Proxy를 생성하는 모습을 확인할 수 있다 (생각보다 엮여있는 코드가 너무 많아서 자세한 설명은 생략. 빈 후처리기를 통해 포인트컷 + 어드바이스를 충족하는 타겟 클래스가 Proxy 클래스를 자동적으로 등록시켜서 프록시 역할을 수행한다는 것을 기억하면 된다.)
+
+`AbstractAutoProxyCreator.postProcessAfterInitialization() 메서드`
+
+```java
+
+
+	@Override
+	public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
+		if (bean != null) {
+			Object cacheKey = getCacheKey(bean.getClass(), beanName);
+			if (this.earlyProxyReferences.remove(cacheKey) != bean) {
+				return wrapIfNecessary(bean, beanName, cacheKey);
+			}
+		}
+		return bean;
+	}
+
+	protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) {
+		if (StringUtils.hasLength(beanName) && this.targetSourcedBeans.contains(beanName)) {
+			return bean;
+		}
+		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
+			return bean;
+		}
+		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
+			this.advisedBeans.put(cacheKey, Boolean.FALSE);
+			return bean;
+		}
+
+		// Create proxy if we have advice.
+		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
+		if (specificInterceptors != DO_NOT_PROXY) {
+			this.advisedBeans.put(cacheKey, Boolean.TRUE);
+			Object proxy = createProxy(
+					bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
+			this.proxyTypes.put(cacheKey, proxy.getClass());
+			return proxy;
+		}
+
+		this.advisedBeans.put(cacheKey, Boolean.FALSE);
+		return bean;
+	}
+```
 
 
 
 
 
+# 요약
 
+1. 특별한 경우가 아니라면 선언적 트랜잭션을 사용하자.
+2. `AbstractPlatformTransactionManager`에서 팩토리 메서드 패턴을 사용해서 여러 `PlatformTransactionManager`을 확장한다.
+3. `TransactionInterceptor` 를 통해 트랜잭션 경계를 설정하고 여기에서 주입된 `PlatformTransactionManager` 를 사용한다.
+4. `SpringTransactionAnnotationParser` 를 통해 `@Transactional` 관련 속성을 파싱한다.
+5. `AbstractAutoProxyCreator` 에 의해 Proxy로 생성되고 실제 클라이언트가 타깃에 접근할때는 Proxy를 거쳐 `TransactionInterceptor` 를 사용해 트랜잭션을 열고 타깃의 메서드를 호출하고 커밋, 롤백을 수행한다.
 
 
 
