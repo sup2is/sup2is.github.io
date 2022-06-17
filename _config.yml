@@ -21,18 +21,21 @@ theme_settings :
         end : 2021-05-14
       - start : 2021-05-31
         experience : 42dot - Java Backend Developer
+        end : 2022-06-02
     skills : 
       - skill : Java
         value : 80  # Percent value
       - skill : Spring
         value : 80  # Percent value
-      - skill : Database
-        value : 60  # Percent value
-      - skill : HTML5 & CSS3 & JQuery
+      - skill : RDB
+        value : 70  # Percent value
+      - skill : Kotlin
         value : 50  # Percent value
-      - skill : Javascript
-        value : 30  # Percent value
       - skill : NoSQL
+        value : 50  # Percent value
+      - skill : HTML5 & CSS3 & JQuery
+        value : 40  # Percent value
+      - skill : Javascript
         value : 30  # Percent value
       - skill : Vue
         value : 30  # Percent value
