@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Mono와 Flux랑 친해지기 with Kotlin"
+title: "Mono와 Flux랑 친해지기 #1 with Kotlin"
 tags: [Reactive, Mono, Flux, Kotlin]
 date: 2022-06-23
 comments: true
@@ -15,6 +15,8 @@ comments: true
 이 글에서는 Mono와 Flux의 주요 API를 한개씩 확인해보면서 어떤 기능을 갖는지에 대해 알아보도록 하겠다. 거의 완전히 [https://projectreactor.io/docs/core/release/reference/index.html#which-operator](https://projectreactor.io/docs/core/release/reference/index.html#which-operator)에 나와있는 API 위주로만 설명한다.
 
 # 시퀀스 만들기
+
+## just(), justOrNull()
 
 이미 데이터가 준비되어 있고 시퀀스를 만들기만 하면 된다면 `just()` 메서드를 사용하면 된다. `just()` 메서드는 `Mono`와 `Flux` 모두 갖고 있다. 추가로 kotlin의 nullable타입 또는 자바의 Optional 타입을 위해 `justOrNull()` 이라는 메서드도 지원해준다. `justOrNull()`은 `Mono`만 갖고 있다.
 
@@ -78,6 +80,8 @@ subscribe: Person(name=woo, age=31)
 ```
 
 데이터를 supplier를 통해 lazy하게 받아올 수 있는 방법도 있다.
+
+## fromSupplier(), defer()
 
 `Mono` 의 `fromSupplier()` 를 사용하는 방법도 있고 `Mono<T>` 나 `Flux<T>` 를 반환하는 supplier를 사용해서 `defer()` 로도 시퀀스를 만들수 있다. 코드를 보면 이해가 쉽다.
 
@@ -148,6 +152,8 @@ subscribe: Person(name=choi, age=29)
 subscribe: Person(name=woo, age=31)
 [ INFO] (main) onComplete()
 ```
+
+## fromArray(), fromIterable(), range(), fromStream()
 
 `Flux` 한정으로 반복되는 요소를 통해 `Flux` 를 만들 수도 있다. 
 
@@ -244,6 +250,10 @@ subscribe: Person(name=choi, age=29)
 [ INFO] (main) | onComplete()
 ```
 
+
+
+## error(), empty(), never()
+
 에러를 발생하거나 바로 데이터가 없는 상태에서 `onComplete`를 호출하도록 `error()` 또는 `empty()` 메서드를 사용할 수도 있다. 추가로 `never()` 를 사용해서 어떤 `onComplete` , `onError`도 발생시키지 않는 시퀀스를 생성할 수도 있다.
 
 ```kotlin
@@ -301,7 +311,6 @@ fun main(args: Array<String>) {
 
 // console
 
-
 ###  Mono.empty()
 
 [ INFO] (main) onSubscribe([Fuseable] Operators.EmptySubscription)
@@ -352,6 +361,8 @@ Caused by: java.lang.IllegalAccessException
 ```
 
 `Mono`나 `Flux`의 `using()` 을 사용해서 함수형 스타일로 시퀀스를 만들 수도 있다. 이함수는 `Callable`, `Function`, `Consumer` 타입의 함수 세개를 받아서 동작한다. 
+
+## using()
 
 ```kotlin
 package me.sup2is.reactiveexam.ch01
@@ -417,13 +428,175 @@ Person(name=choi, age=29)
 [ INFO] (main) | onComplete()
 ```
 
+## generate(), create()
+
+프로그래밍 방식으로 이벤트를 생성하는 Flux의 `generate()` 를 사용하거나 `create()` 를 사용할 수 있다. `generate()` 는 동기식으로 한번에 한개씩 생성하고 `create()` 는 비동기로 여러개를 방출한다. `generate()`는 상태를 유지하지만 `create()`는 상태를 유지하지 않는다. `SynchronousSink` 는 한번의 `next()`만 가능하고 `FluxSink`는 필요한만큼 `next()`를 호출할 수 있는 특징이 있다.
+
+```kotlin
+package me.sup2is.reactiveexam.ch01
+
+import reactor.core.publisher.Flux
+import reactor.core.publisher.SynchronousSink
+
+fun main(args: Array<String>) {
+
+    println("\n###  Flux.generate()\n")
+
+    val callable = {
+        arrayOf(0, 1)
+    }
+
+    var emitCounter = 0
+    val biFunction: (Array<Int>, SynchronousSink<Int>) -> Array<Int> = { ints: Array<Int>, synchronousSink: SynchronousSink<Int> ->
+        synchronousSink.next(ints[0])
+        emitCounter ++
+        if (emitCounter >= 10) {
+            synchronousSink.complete()
+        }
+
+        val temp = ints[0]
+        ints[0] = ints[1]
+        ints[1] = ints[1] + temp
+        ints
+    }
+
+    Flux.generate(
+        callable, biFunction
+    ).log()
+        .subscribe()
+}
+
+// console
+
+###  Flux.generate()
+
+[ INFO] (main) | onSubscribe([Fuseable] FluxGenerate.GenerateSubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(0)
+[ INFO] (main) | onNext(1)
+[ INFO] (main) | onNext(1)
+[ INFO] (main) | onNext(2)
+[ INFO] (main) | onNext(3)
+[ INFO] (main) | onNext(5)
+[ INFO] (main) | onNext(8)
+[ INFO] (main) | onNext(13)
+[ INFO] (main) | onNext(21)
+[ INFO] (main) | onNext(34)
+[ INFO] (main) | onComplete()
+
+```
 
 
-프로그래밍 방식으로 이벤트를 생성하는 Flux의 `generate()` 를 사용하거나 `create()` 를 사용할 수 있다. `generate()` 는 동기식으로 한번에 한개씩 생성하고 `create()` 는 비동기로 여러개를 방출한다.
+
+# 기존 시퀀스를 변환하기
+
+기본적인 시퀀스 생성 방법을 알았기 때문에 이제 시퀀스를 변환하는 방법을 알아보도록 하자.
+
+## map(), cast(), index()
+
+`map()`은 java Stream에서 제공하는 `map()`과 매우 유사하다. 다만 항상 `Mono`나 `Flux` 타입으로 감싸져있다. `cast()` 는 단순히 캐스팅 하는 용도로 사용할 수 있다. `index()`는 `Flux`에서 요소의 index가 필요할때 사용할 수 있다.
+
+```kotlin
+package me.sup2is.reactiveexam.ch02
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+
+fun main(args: Array<String>) {
+
+    println("\n###  Mono.map()\n")
+
+    Mono.just(Person(name = "choi", age = 29))
+        .log()
+        .map { it.age }
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.map()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    ).log()
+        .map { it.name }
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Mono.cast()\n")
+
+    Mono.just(Person(name = "choi", age = 29))
+        .log()
+        .cast(Any::class.java)
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.cast()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    ).log()
+        .cast(Any::class.java)
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.index()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    ).log()
+        .index()
+        .subscribe { println("index: ${it.t1}, data: ${it.t2}") }
+}
+
+// console
+
+###  Mono.map()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] Operators.ScalarSubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+subscribe: 29
+[ INFO] (main) | onComplete()
+
+###  Flux.map()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+subscribe: choi
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+subscribe: woo
+[ INFO] (main) | onComplete()
+
+###  Mono.cast()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] Operators.ScalarSubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) | onComplete()
+
+###  Flux.cast()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) | onComplete()
+
+###  Flux.index()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+index: 0, data: Person(name=choi, age=29)
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+index: 1, data: Person(name=woo, age=31)
+[ INFO] (main) | onComplete()
+```
 
 
-
-# 요약
 
 
 
@@ -442,5 +615,6 @@ Person(name=choi, age=29)
   - [https://godekdls.github.io/Reactor%20Core/appendixawhichoperatordoineed/](https://godekdls.github.io/Reactor%20Core/appendixawhichoperatordoineed/)
   - [https://projectreactor.io/docs/core/release/reference/index.html#which-operator](https://projectreactor.io/docs/core/release/reference/index.html#which-operator)
   - [https://www.woolha.com/tutorials/project-reactor-using-mono-never-and-flux-never-examples](https://www.woolha.com/tutorials/project-reactor-using-mono-never-and-flux-never-examples)
+  - [https://www.baeldung.com/flux-sequences-reactor](https://www.baeldung.com/flux-sequences-reactor)
 
   
