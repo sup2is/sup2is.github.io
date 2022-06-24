@@ -8,6 +8,8 @@ comments: true
 
 <br>
 
+# Table of Contents
+
 * [Overview](#overview)
 * [Scope Function](#scope-function)
    * [let](#let)
