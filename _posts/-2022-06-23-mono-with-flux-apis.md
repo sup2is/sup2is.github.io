@@ -596,6 +596,330 @@ index: 1, data: Person(name=woo, age=31)
 [ INFO] (main) | onComplete()
 ```
 
+## flatMap(), flatMapSequential(), handle(), flatMapMany()
+
+`Flux`의 요소별로 1:N 으로 변형이 필요하다면 `flatMap()`을 사용할 수 있다. `flatMap()` 은 비동기적으로 실행되기 때문에 순서가 필요하다면 `flatMapSequential()` 을 사용하면 된다.
+
+`Flux`의  `handle()` 을 사용하면 넘어오는 요소에 대한 식을 작성해서 유연하게 동작하도록 할 수 있다. `Mono`의 `flatMapMany()`를 사용해서 `Flux`로 방출할 수도 있다. 
+
+```kotlin
+package me.sup2is.reactiveexam.ch02
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.core.publisher.SynchronousSink
+
+fun main(args: Array<String>) {
+
+    println("\n###  Flux.flatmap()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    ).log()
+        .flatMap {
+            Flux.just(*it.name.toList().toTypedArray())
+        }
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.flatMapSequential()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    ).log()
+        .flatMapSequential {
+            Flux.just(*it.name.toList().toTypedArray())
+        }
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.handle()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    ).log()
+        .handle { person: Person, synchronousSink: SynchronousSink<String> ->
+            if (person.age == 29) {
+                synchronousSink.next(person.name)
+            } else {
+                synchronousSink.complete()
+            }
+        }
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Mono.flatMapMany()\n")
+
+    Mono.just(
+        Person(name = "choi", age = 29)
+    ).log()
+        .flatMapMany {
+            Flux.just(*it.name.toList().toTypedArray())
+        }
+        .subscribe { println("subscribe: $it") }
+}
+
+// console
+
+###  Flux.flatmap()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(256)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+subscribe: c
+subscribe: h
+subscribe: o
+subscribe: i
+[ INFO] (main) | request(1)
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+subscribe: w
+subscribe: o
+subscribe: o
+[ INFO] (main) | request(1)
+[ INFO] (main) | onComplete()
+
+###  Flux.flatMapSequential()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(256)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+subscribe: c
+subscribe: h
+subscribe: o
+subscribe: i
+[ INFO] (main) | request(1)
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+subscribe: w
+subscribe: o
+subscribe: o
+[ INFO] (main) | request(1)
+[ INFO] (main) | onComplete()
+
+###  Flux.handle()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArrayConditionalSubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+subscribe: choi
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+[ INFO] (main) | cancel()
+
+###  Mono.flatMapMany()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] Operators.ScalarSubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+subscribe: c
+subscribe: h
+subscribe: o
+subscribe: i
+[ INFO] (main) | onComplete()
+```
+
+
+
+## startWith(), concatWith()
+
+기존 시퀀스에 요소를 추가하고 싶을때는 `startWith()`와 `concatWith()`를 사용할 수 있다. `startWith()`는 시퀀스의 처음에 추가하고 `concatWith()`는 시퀀스의 뒤에 추가한다. `concatWith()`는 `Publisher` 타입을 받는 특징이 있고 두 메서드 모두 `Flux`에만 있는 메서드다.
+
+```kotlin
+package me.sup2is.reactiveexam.ch02
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+
+fun main(args: Array<String>) {
+
+    println("\n###  Flux.startWith()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    ).log()
+        .startWith(Person(name = "yoon", age = 30))
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.concatWith()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    ).log()
+        .concatWith(Mono.just(Person(name = "yoon", age = 30)))
+        .subscribe { println("subscribe: $it") }
+}
+
+// console
+
+###  Flux.startWith()
+
+subscribe: Person(name=yoon, age=30)
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) | onComplete()
+
+###  Flux.concatWith()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) | onComplete()
+subscribe: Person(name=yoon, age=30)
+```
+
+## collectList(), collectSortedList(), collectMap(), collectMultiMap(), collect(), count()
+
+이 메서드들은 모두 집계와 관련된 메서드들이다. `collectList()` 는 `MutableList` 타입으로 요소들을 묶어준다. 나처럼 reactive에 익숙하지 않은 사람들은 주의해야 할 점이 있는게 단순히  `collectXXX()` 라고해서 특정 `List` 또는 `Map`으로 반환하는게 아니라 Mono에 담겨서 온다는 점이다. 앞으로 설명할 메서드 모두 `Mono`타입으로 리턴한다.
+
+`collectSortedList()`은  `collectList()` 와 기본적인 기능은 같지만 정렬을 시켜준다. 이 때 요소들이 `Comparable` 인터페이스를 구현하고 있어야하고 이건 컴파일타임이 아니라 런타임에 에러를 발생한다는 점을 기억해야 한다. 
+
+`collectMap()` 은 요소들을 특정 key로 묶어주는데 중복된 값이 있다면 가장 마지막으로 내보낸 요소가 값이된다. 우리가 기본적으로 예상하는 기능은 `collectMultiMap()` 이다. 이 메서드는  1:N 형태로 묶어준다.
+
+`collect()`는 `java.util.stream.Collector` 타입을 받는 메서드인데 보통 java8의 스트림에서 사용하는 `collect()` 메서드와 같다고 생가하면 편할 것 같다.
+
+마지막으로 `count()`는 요소들의 개수를 반환해준다.
+
+```kotlin
+package me.sup2is.reactiveexam.ch02
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+import java.util.stream.Collectors
+
+fun main(args: Array<String>) {
+
+    println("\n###  Flux.collectList()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    ).log()
+        .collectList()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.collectSortedList()\n")
+
+    Flux.just(
+        'b', 'd', 'c', 'a'
+    ).log()
+        .collectSortedList()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.collectMap()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31),
+        Person(name = "choi", age = 31),
+        Person(name = "woo", age = 34)
+    ).log()
+        .collectMap { it.name }
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.collectMultiMap()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31),
+        Person(name = "choi", age = 31),
+        Person(name = "woo", age = 34)
+    ).log()
+        .collectMultimap { it.name }
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.collect()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    ).log()
+        .collect(Collectors.toList())
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.count()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    ).log()
+        .count()
+        .subscribe { println("subscribe: $it") }
+}
+
+// console
+
+###  Flux.collectList()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+[ INFO] (main) | onComplete()
+subscribe: [Person(name=choi, age=29), Person(name=woo, age=31)]
+
+###  Flux.collectSortedList()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(b)
+[ INFO] (main) | onNext(d)
+[ INFO] (main) | onNext(c)
+[ INFO] (main) | onNext(a)
+[ INFO] (main) | onComplete()
+subscribe: [a, b, c, d]
+
+###  Flux.collectMap()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+[ INFO] (main) | onNext(Person(name=choi, age=31))
+[ INFO] (main) | onNext(Person(name=woo, age=34))
+[ INFO] (main) | onComplete()
+subscribe: {choi=Person(name=choi, age=31), woo=Person(name=woo, age=34)}
+
+###  Flux.collectMultiMap()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+[ INFO] (main) | onNext(Person(name=choi, age=31))
+[ INFO] (main) | onNext(Person(name=woo, age=34))
+[ INFO] (main) | onComplete()
+subscribe: {choi=[Person(name=choi, age=29), Person(name=choi, age=31)], woo=[Person(name=woo, age=31), Person(name=woo, age=34)]}
+
+###  Flux.collect()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+[ INFO] (main) | onComplete()
+subscribe: [Person(name=choi, age=29), Person(name=woo, age=31)]
+
+###  Flux.count()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+[ INFO] (main) | onComplete()
+subscribe: 2
+```
+
+
+
 
 
 
