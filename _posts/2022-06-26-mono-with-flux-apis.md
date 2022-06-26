@@ -1442,7 +1442,468 @@ subscribe: choi and woo
 [ INFO] (main) onComplete()
 ```
 
+## and(), when(), firstWithSignal()
+
+`Mono`의 `and()`는 이 모노와 다른 `Publisher`의 종료 신호를 `Mono<Void>` 에 결합해서 리턴해준다. `when()`은 N개의 Publisher가 모두 종료되어야 `Mono<Void>` 으로 리턴해준다. 모든 소스들의 종료신호를 받아야 할 때 사용하는 것 같다.
+
+`firstWithSignal()` 은 인자로 넘어간 `Publisher`들 중 가장 먼저 값을 방출하는 시퀀스만 구독이 필요할때 사용한다.
+
+```kotlin
+
+package me.sup2is.reactiveexam.ch02
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+
+fun main(args: Array<String>) {
+
+    val group1 = Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    )
+
+    val group2 = Flux.just(
+        Person(name = "yoon", age = 30),
+        Person(name = "hwang", age = 30)
+    )
+
+    val choi = Mono.just(Person(name = "choi", age = 29))
+
+    val woo = Mono.just(Person(name = "woo", age = 31))
+
+    println("\n###  Mono.and()\n")
+
+    choi.and(woo)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Mono.when()\n")
+
+    Mono.`when`(choi, woo)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Mono.firstWithSignal()\n")
+
+    Mono.firstWithSignal(choi, woo)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.firstWithSignal()\n")
+
+    Flux.firstWithSignal(group1, group2)
+        .log()
+        .subscribe { println("subscribe: $it") }
+}
+
+// console
+
+###  Mono.and()
+
+[ INFO] (main) onSubscribe([Fuseable] MonoWhen.WhenCoordinator)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onComplete()
+
+###  Mono.when()
+
+[ INFO] (main) onSubscribe([Fuseable] MonoWhen.WhenCoordinator)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onComplete()
+
+###  Mono.firstWithSignal()
+
+[ INFO] (main) onSubscribe(FluxFirstWithSignal.RaceCoordinator)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) onComplete()
+
+###  Flux.firstWithSignal()
+
+[ INFO] (main) onSubscribe(FluxFirstWithSignal.RaceCoordinator)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) onComplete()
+```
+
+
+
+## switchMap(), switchOnNext()
+
+`switchMap()`은 인자로 넘어간 `Function`를 통해 생성된 새로운 `Publisher` 타입으로 전환해주고 이런 요소는 다시 `Flux` 타입으로 방출된다.
+
+`switchOnNext()`는 인자의 순서대로 `Publisher`를 미러링하는 Flux를 만들고 다음 `Publisher`가 값을 올릴때까지 이전 `Publisher`가 데이터를 전달한다. 마지막 `Publisher`의 데이터 전달이 끝나면 완료된다.
+
+```kotlin
+
+package me.sup2is.reactiveexam.ch02
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+
+fun main(args: Array<String>) {
+
+    val group1 = Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    )
+
+    val group2 = Flux.just(
+        Person(name = "yoon", age = 30),
+        Person(name = "hwang", age = 30)
+    )
+
+    println("\n###  Flux.switchMap()\n")
+
+    group1.switchMap {
+        Mono.just(it.name)
+    }.log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.switchOnNext()\n")
+
+    Flux.switchOnNext(Flux.just(group1, group2))
+        .log()
+        .subscribe { println("subscribe: $it") }
+}
+
+// console
+
+###  Flux.switchMap()
+
+[ INFO] (main) onSubscribe(FluxSwitchMap.SwitchMapMain)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(choi)
+subscribe: choi
+[ INFO] (main) onNext(woo)
+subscribe: woo
+[ INFO] (main) onComplete()
+
+###  Flux.switchOnNext()
+
+[ INFO] (main) onSubscribe(FluxSwitchMap.SwitchMapMain)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) onNext(Person(name=yoon, age=30))
+subscribe: Person(name=yoon, age=30)
+[ INFO] (main) onNext(Person(name=hwang, age=30))
+subscribe: Person(name=hwang, age=30)
+[ INFO] (main) onComplete()
+```
+
+
+
+## repeat(), interval()
+
+`repeat()`은 `Publisher`를 얼마나 반복시킬지 정할 수 있고 `interval()`로 간격을 둘 수 있다.
+
+```kotlin
+
+package me.sup2is.reactiveexam.ch02
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+import java.time.Duration
+
+fun main(args: Array<String>) {
+
+    val group1 = Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    )
+
+    println("\n###  Flux.repeat()\n")
+
+    group1.repeat(2)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.interval()\n")
+
+    Flux.interval(Duration.ofSeconds(1))
+        .flatMap {
+            group1
+        }
+        .repeat(2)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    Thread.sleep(3000)
+}
+
+// console
+
+###  Flux.repeat()
+
+[ INFO] (main) onSubscribe(FluxRepeat.RepeatSubscriber)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) onComplete()
+
+###  Flux.interval()
+
+[ INFO] (main) onSubscribe(FluxRepeat.RepeatSubscriber)
+[ INFO] (main) request(unbounded)
+[ INFO] (parallel-1) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (parallel-1) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (parallel-1) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (parallel-1) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (parallel-1) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (parallel-1) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+```
+
+
+
+## defaultIfEmpty(), switchIfEmpty()
+
+`defaultIfEmpty()`, `switchIfEmpty()` 모두 `Mono`, `Flux` 에 있는 메서드다. `defaultIfEmpty()` 는 만약 값이 비어있을때 T 타입의 default값 데이터를 정의할 수 있고 `switchIfEmpty()` 는 `Publisher<T>` 타입의 default 값을 정의할 수 있다.
+
+```kotlin
+
+package me.sup2is.reactiveexam.ch02
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+
+fun main(args: Array<String>) {
+
+    val group1 = Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    )
+
+    val choi = Mono.just(Person(name = "choi", age = 29))
+
+    println("\n###  Mono.defaultIfEmpty()\n")
+
+    Mono.empty<Person>()
+        .defaultIfEmpty(Person(name = "choi", age = 29))
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.defaultIfEmpty()\n")
+
+    Flux.empty<Person>()
+        .defaultIfEmpty(Person(name = "woo", age = 31))
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Mono.switchIfEmpty()\n")
+
+    Mono.empty<Person>()
+        .switchIfEmpty(choi)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.switchIfEmpty()\n")
+
+    Flux.empty<Person>()
+        .switchIfEmpty(group1)
+        .log()
+        .subscribe { println("subscribe: $it") }
+}
+
+// console
+
+###  Mono.defaultIfEmpty()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] Operators.ScalarSubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) | onComplete()
+
+###  Flux.defaultIfEmpty()
+
+[ INFO] (main) onSubscribe([Fuseable] FluxDefaultIfEmpty.DefaultIfEmptySubscriber)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) onComplete()
+
+###  Mono.switchIfEmpty()
+
+[ INFO] (main) onSubscribe(FluxSwitchIfEmpty.SwitchIfEmptySubscriber)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) onComplete()
+
+###  Flux.switchIfEmpty()
+
+[ INFO] (main) onSubscribe(FluxSwitchIfEmpty.SwitchIfEmptySubscriber)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) onComplete()
+```
+
+
+
+## ignoreElements(), then(), thenEmpty(), thenReturn(), thenMany(), delayUntil()
+
+`ignoreElements()` 는 주어진 데이터들은 무시하고 종료신호를 얻을때 사용한다.
+
+인자가 없는`then()`은 `ignoreElements()` 와 비슷하게 종료신호를 얻을때 사용하고 추가로 오류 신호도 얻을 수 있다. 인자가 있는 `then()`은 `A.then(B)` 일 때 A는 완성하지만 값은 무시하고 B의 값을 반환하고 완료한다.
+
+`A.thenEmpty(B)` 도 인자가 있는 `then()` 과 비슷하지만 B가 `Mono<Void>` 타입이어야 한다. A의 값은 무시하고 최종적으로 반환하는 타입도 `Mono<Void>` 타입이다.
+
+`A.thenReturn(B)` 도 A가 성공적으로 완료되도록 한 다음 인자로 넘어간 B 값을 내보낸다. 이때 다음 인자값은 `T` 타입이다.
+
+`A.thenMany(B)`도 마찬가지로 A가 성공적으로 완료되도록 한 다음 A의 값은 무시하고 인자로 넘어온 `Flux`(B) 를 방출해준다.
+
+`A.delayUntil(B)` 는 A가 방출될 때까지 기다리고 방출되더라도 주어진 B가 완료될 때까지 기다린 뒤에 최종적으로 완료된다.
+
+```kotlin
+
+package me.sup2is.reactiveexam.ch02
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+
+fun main(args: Array<String>) {
+
+    val group1 = Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    )
+
+    val choi = Mono.just(Person(name = "choi", age = 29))
+
+    val woo = Mono.just(Person(name = "woo", age = 31))
+
+    println("\n###  Mono.ignoreElements()\n")
+
+    Mono.ignoreElements(choi)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Mono.then()\n")
+
+    choi.then()
+        .log()
+        .subscribe { println("subscribe: $it") }
+
  
+    println("\n###  Mono.then()\n")
+
+    choi.then(woo)
+        .log()
+        .subscribe { println("subscribe: $it") }
+  
+    println("\n###  Mono.thenEmpty()\n")
+
+    choi.thenEmpty(Mono.empty())
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Mono.thenReturn()\n")
+
+    choi.thenReturn(Person(name = "woo", age = 31))
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Mono.thenMany()\n")
+
+    choi.thenMany(group1)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Mono.delayUntil()\n")
+
+    choi.delayUntil { woo }
+        .log()
+        .subscribe { println("subscribe: $it") }
+}
+
+// console
+
+###  Mono.ignoreElements()
+
+[ INFO] (main) onSubscribe(MonoIgnoreElements.IgnoreElementsSubscriber)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onComplete()
+
+###  Mono.then()
+
+[ INFO] (main) onSubscribe(MonoIgnoreElements.IgnoreElementsSubscriber)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onComplete()
+
+###  Mono.then()
+
+[ INFO] (main) onSubscribe(MonoIgnoreThen.ThenIgnoreMain)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) onComplete()
+
+###  Mono.thenEmpty()
+
+[ INFO] (main) onSubscribe(MonoIgnoreThen.ThenIgnoreMain)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onComplete()
+
+###  Mono.thenReturn()
+
+[ INFO] (main) onSubscribe(MonoIgnoreThen.ThenIgnoreMain)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) onComplete()
+
+###  Mono.thenMany()
+
+[ INFO] (main) onSubscribe(FluxConcatArray.ConcatArraySubscriber)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) onComplete()
+
+###  Mono.delayUntil()
+
+[ INFO] (main) onSubscribe(MonoDelayUntil.DelayUntilCoordinator)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) onComplete()
+
+```
+
+
+
+
 
 <br>
 
@@ -1450,7 +1911,7 @@ subscribe: choi and woo
 
 포스팅은 여기까지 하겠습니다. 감사합니다!
 
-
+예제: [https://github.com/sup2is/study/tree/master/reactive/reactive-with-kotlin](https://github.com/sup2is/study/tree/master/reactive/reactive-with-kotlin)
 
 <br>
 
