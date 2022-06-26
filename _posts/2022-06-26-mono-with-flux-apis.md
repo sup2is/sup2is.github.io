@@ -2,7 +2,7 @@
 layout: post
 title: "Mono와 Flux랑 친해지기 #1 with Kotlin"
 tags: [Reactive, Mono, Flux, Kotlin]
-date: 2022-06-23
+date: 2022-06-26
 comments: true
 ---
 
@@ -12,7 +12,7 @@ comments: true
 
 먼저 이 글에서 reactive core에 대한 이야기는 하지 않는다. 설명을 잘 할 자신도 없고 심지어 제대로 이해도 못한 것 같다. 만약 reactive core에 관심이 있거나 관련지식이 0인 상태라면 토비님의 [토비의 봄 TV 리액티브 프로그래밍](https://www.youtube.com/watch?v=8fenTR3KOJo&list=PLOLeoJ50I1kkqC4FuEztT__3xKSfR2fpw) 을 보는걸 매우 추천한다.
 
-이 글에서는 Mono와 Flux의 주요 API를 한개씩 확인해보면서 어떤 기능을 갖는지에 대해 알아보도록 하겠다. 거의 완전히 [https://projectreactor.io/docs/core/release/reference/index.html#which-operator](https://projectreactor.io/docs/core/release/reference/index.html#which-operator)에 나와있는 API 위주로만 설명한다.
+이 글에서는 Mono와 Flux의 주요 API를 한개씩 확인해보면서 어떤 기능을 갖는지에 대해 알아보도록 한다. 거의 완전히 [https://projectreactor.io/docs/core/release/reference/index.html#which-operator](https://projectreactor.io/docs/core/release/reference/index.html#which-operator)에 나와있는 API 위주로만 설명한다. 따로 편집하기 힘들어서 넣진 않았지만 ... 이해가 어렵다면 docs에 있는 마블다이어그램과 같이 보는걸 매우매우 추천한다.
 
 # 시퀀스 만들기
 
@@ -920,9 +920,529 @@ subscribe: 2
 
 
 
+## reduce(), scan()
+
+요소들을 특정 함수로 합치고싶으면 `reduce()`와 `scan()` 을 사용할 수 있다. `reduce()` 는 모든 요소의 최종 값 하나만 방출하지만 `scan()`은 중간중간 요소들마다 방출한다.
+
+```kotlin
+package me.sup2is.reactiveexam.ch02
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+
+fun main(args: Array<String>) {
+
+    println("\n###  Flux.reduce()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31),
+        Person(name = "choi", age = 31),
+        Person(name = "woo", age = 34)
+    ).log()
+        .map { it.age }
+        .reduce { age1, age2 ->
+            age1 + age2
+        }
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.scan()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31),
+        Person(name = "choi", age = 31),
+        Person(name = "woo", age = 34)
+    ).log()
+        .map { it.age }
+        .scan { age1, age2 ->
+            age1 + age2
+        }
+        .subscribe { println("subscribe: $it") }
+
+}
+
+// console
+
+###  Flux.reduce()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+[ INFO] (main) | onNext(Person(name=choi, age=31))
+[ INFO] (main) | onNext(Person(name=woo, age=34))
+[ INFO] (main) | onComplete()
+subscribe: 125
+
+###  Flux.scan()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+subscribe: 29
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+subscribe: 60
+[ INFO] (main) | onNext(Person(name=choi, age=31))
+subscribe: 91
+[ INFO] (main) | onNext(Person(name=woo, age=34))
+subscribe: 125
+[ INFO] (main) | onComplete()
+```
+
+## all(), any(), hasElements(), hasElement()
+
+이 메
+
+```kotlin
+package me.sup2is.reactiveexam.ch02
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+
+fun main(args: Array<String>) {
+
+    println("\n###  Flux.all()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31),
+        Person(name = "choi", age = 31),
+        Person(name = "woo", age = 34)
+    ).log()
+        .all { it.name == "choi" }
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.any()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31),
+        Person(name = "choi", age = 31),
+        Person(name = "woo", age = 34)
+    ).log()
+        .any { it.name == "choi" }
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.hasElements()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31),
+        Person(name = "choi", age = 31),
+        Person(name = "woo", age = 34)
+    ).log()
+        .hasElements()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.hasElement()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31),
+        Person(name = "choi", age = 31),
+        Person(name = "woo", age = 34)
+    ).log()
+        .map { it.name }
+        .hasElement("choi")
+        .subscribe { println("subscribe: $it") }
+}
+
+// console
+
+###  Flux.all()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+[ INFO] (main) | cancel()
+subscribe: false
+
+###  Flux.any()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+[ INFO] (main) | cancel()
+subscribe: true
+
+###  Flux.hasElements()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+[ INFO] (main) | cancel()
+subscribe: true
+
+###  Flux.hasElement()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+[ INFO] (main) | cancel()
+subscribe: true
+```
 
 
 
+
+
+
+
+## all(), any(), hasElements(), hasElement()
+
+이 네개의 메서드들은 모두 `Mono<Boolean>` 형태로 리턴하는 메서드다. `all()`은 주어진 `Predicate`에 모든 요소가 일치하는지 확인한다. `any()`는 한 개라도 있으면 true를 반환한다.
+
+`hasElements()`는 요소가 0인지 확인하고 `hasElement()`는 인자로 넘긴 특정 값이 존재하는지를 확인해준다.
+
+```kotlin
+package me.sup2is.reactiveexam.ch02
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+
+fun main(args: Array<String>) {
+
+    println("\n###  Flux.all()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31),
+        Person(name = "choi", age = 31),
+        Person(name = "woo", age = 34)
+    ).log()
+        .all { it.name == "choi" }
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.any()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31),
+        Person(name = "choi", age = 31),
+        Person(name = "woo", age = 34)
+    ).log()
+        .any { it.name == "choi" }
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.hasElements()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31),
+        Person(name = "choi", age = 31),
+        Person(name = "woo", age = 34)
+    ).log()
+        .hasElements()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.hasElement()\n")
+
+    Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31),
+        Person(name = "choi", age = 31),
+        Person(name = "woo", age = 34)
+    ).log()
+        .map { it.name }
+        .hasElement("choi")
+        .subscribe { println("subscribe: $it") }
+}
+
+// console
+
+###  Flux.all()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+[ INFO] (main) | cancel()
+subscribe: false
+
+###  Flux.any()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+[ INFO] (main) | cancel()
+subscribe: true
+
+###  Flux.hasElements()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+[ INFO] (main) | cancel()
+subscribe: true
+
+###  Flux.hasElement()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+[ INFO] (main) | cancel()
+subscribe: true
+```
+
+
+
+## concat(), concatWith(), concatDelayError(), mergeSequential(), merge(), mergeWith()
+
+시퀀스들을 하나로 묶을 때 사용할 수 있는 메서드들이다. 
+
+`concat()`은 인자로 넘어오는 모든 `Publisher` 를 하나로 묶어주는 기능이다. 인자의 순서대로 구독하고 구독이 완료되어야 다음 인자를 구독하는 특징이 있다. 오류가 발생하면 시퀀스를 즉시 중단한다. 인스턴스 메서드로 `concatWith()`를 사용할 수 있다.
+
+만약 오류가 발생하더라도 계속해서 시퀀스를 구독하고싶으면 `concatDelayError()` 를 사용하면 된다. 맨 마지막에 오류가 발생한다.
+
+만약 동기식? 으로 `concat()` 을 사용하는게 아니라 바로바로 시퀀스들을 구독하고싶으면 `mergeSequential()`을 사용해볼 수 있다. `mergeSequential()`은 모든 시퀀스들에 대해 즉시 subscribe를 시도하고 `concat()` 과 동일하게 구독순서에 최종적으로 따라 병합시켜준다.
+
+`merge()`를 사용하면 실제 subscribe 시점에 넘어오는 데이터들에 대해 비동기적으로 병합을 할 수 있게 해준다. `mergeSequential()` 은 최종적으로 구독 순서에 따라 시퀀셜하게 병합하지만 `merge()`는 즉시 병합한다. 인스턴스 메서드로 `merge()`를 사용할 수 있다.
+
+
+
+```kotlin
+package me.sup2is.reactiveexam.ch02
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+
+fun main(args: Array<String>) {
+
+    val group1 = Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    )
+
+    val group2 = Flux.just(
+        Person(name = "yoon", age = 30),
+        Person(name = "hwang", age = 30)
+    )
+
+    println("\n###  Flux.concat()\n")
+
+    Flux.concat(group1, group2)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.concatWith()\n")
+
+    group1.concatWith(group2)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.concatDelayError()\n")
+
+    Flux.concatDelayError(group1, group2)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.mergeSequential()\n")
+
+    Flux.mergeSequential(group1, group2)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.merge()\n")
+
+    Flux.merge(group1)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.mergeWith()\n")
+
+    group1.mergeWith(group2)
+        .log()
+        .subscribe { println("subscribe: $it") }
+}
+
+// console
+
+###  Flux.concat()
+
+[ INFO] (main) onSubscribe(FluxConcatArray.ConcatArraySubscriber)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) onNext(Person(name=yoon, age=30))
+subscribe: Person(name=yoon, age=30)
+[ INFO] (main) onNext(Person(name=hwang, age=30))
+subscribe: Person(name=hwang, age=30)
+[ INFO] (main) onComplete()
+
+###  Flux.concatWith()
+
+[ INFO] (main) onSubscribe(FluxConcatArray.ConcatArraySubscriber)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) onNext(Person(name=yoon, age=30))
+subscribe: Person(name=yoon, age=30)
+[ INFO] (main) onNext(Person(name=hwang, age=30))
+subscribe: Person(name=hwang, age=30)
+[ INFO] (main) onComplete()
+
+###  Flux.concatDelayError()
+
+[ INFO] (main) onSubscribe(FluxConcatArray.ConcatArrayDelayErrorSubscriber)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) onNext(Person(name=yoon, age=30))
+subscribe: Person(name=yoon, age=30)
+[ INFO] (main) onNext(Person(name=hwang, age=30))
+subscribe: Person(name=hwang, age=30)
+[ INFO] (main) onComplete()
+
+###  Flux.mergeSequential()
+
+[ INFO] (main) onSubscribe(FluxMergeSequential.MergeSequentialMain)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) onNext(Person(name=yoon, age=30))
+subscribe: Person(name=yoon, age=30)
+[ INFO] (main) onNext(Person(name=hwang, age=30))
+subscribe: Person(name=hwang, age=30)
+[ INFO] (main) onComplete()
+
+###  Flux.merge()
+
+[ INFO] (main) | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) | onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) | onComplete()
+
+###  Flux.mergeWith()
+
+[ INFO] (main) onSubscribe(FluxFlatMap.FlatMapMain)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+[ INFO] (main) onNext(Person(name=yoon, age=30))
+subscribe: Person(name=yoon, age=30)
+[ INFO] (main) onNext(Person(name=hwang, age=30))
+subscribe: Person(name=hwang, age=30)
+[ INFO] (main) onComplete()
+```
+
+
+
+## zip(), zipWith()
+
+이 메서드들도 시퀀스를 하나로 묶을때 사용 가능하다.
+
+`zip()`은 넘어오는 모든 소스들이 요소를 방출할 때까지 기다렸다가 미리 정의된 `Function`에 의해 하나의 값으로 방출될때 사용할 수 있다. 인스턴스 메서드는 `zipWith()`를 사용하면 된다. `Mono`와 `Flux` 모두 갖고 있다.
+
+
+
+```kotlin
+package me.sup2is.reactiveexam.ch02
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+
+fun main(args: Array<String>) {
+
+    val group1 = Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31)
+    )
+
+    println("\n###  Flux.zip()\n")
+
+    val biFunction: (Person, Int) -> String = {
+            person, int ->
+        "index: $int = ${person.name}"
+    }
+
+    Flux.zip(group1, Flux.just(1, 2, 3, 4, 5), biFunction)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Flux.zipWith()\n")
+
+    group1.zipWith(Flux.just(1, 2, 3, 4, 5), biFunction)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    val biFunction2: (Person, Person) -> String = {
+            person1, person2 ->
+        "${person1.name} and ${person2.name}"
+    }
+
+    println("\n###  Mono.zip()\n")
+
+    val choi = Mono.just(Person(name = "choi", age = 29))
+
+    val woo = Mono.just(Person(name = "woo", age = 31))
+
+    Mono.zip(choi, woo, biFunction2)
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n###  Mono.zipWith()\n")
+
+    choi.zipWith(woo, biFunction2)
+        .log()
+        .subscribe { println("subscribe: $it") }
+}
+
+// console
+
+###  Flux.zip()
+
+[ INFO] (main) onSubscribe(FluxZip.ZipCoordinator)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(index: 1 = choi)
+subscribe: index: 1 = choi
+[ INFO] (main) onNext(index: 2 = woo)
+subscribe: index: 2 = woo
+[ INFO] (main) onComplete()
+
+###  Flux.zipWith()
+
+[ INFO] (main) onSubscribe(FluxZip.ZipCoordinator)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(index: 1 = choi)
+subscribe: index: 1 = choi
+[ INFO] (main) onNext(index: 2 = woo)
+subscribe: index: 2 = woo
+[ INFO] (main) onComplete()
+
+###  Mono.zip()
+
+[ INFO] (main) onSubscribe([Fuseable] MonoZip.ZipCoordinator)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(choi and woo)
+subscribe: choi and woo
+[ INFO] (main) onComplete()
+
+###  Mono.zipWith()
+
+[ INFO] (main) onSubscribe([Fuseable] MonoZip.ZipCoordinator)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext(choi and woo)
+subscribe: choi and woo
+[ INFO] (main) onComplete()
+```
+
+ 
 
 <br>
 
