@@ -966,7 +966,13 @@ Caused by: java.lang.IllegalStateException
 
 # 시간값 다루기
 
-## timed(), timestamp(), delayElements()
+## timed(), ,elapsed(), timestamp(), delayElements()
+
+`timed()` 를 사용하면 `Timed` 개체로 캡슐화시킬 수 있다. `Timed`에서는 이벤트와 관련된 시간을 확인할 수 있다.
+
+`elapsed()` 는 구독 시점부터 요소별로 경과된 시간 값을 측정할 수 있다.  `timestamp()` 는 실제 요소 방출된 시점에 대한 시스템 클록 시간을 측정할 수 있다. 직접 `Flux`의 `elapsed()`나 `timestamp()` 를 사용하는 것은 레거시 스타일이고 최상의 정밀도를 위해 `timed()` 로 한번 래핑시키는걸 추천하는 것 같다. `timed()` 도 `elapsed()`와 `timestamp()`를 지원한다.
+
+`delayElements()` 를 사용하면 각각 주어진 `Duration` 만큼 요소 방출을 지연시킬 수 있다. 빈 시퀀스나 오류는 지연되지 않는다.
 
 ```kotlin
 package me.sup2is.reactiveexam.ch06
@@ -988,10 +994,29 @@ fun main(args: Array<String>) {
         .log()
         .subscribe { println("subscribe: $it") }
 
-    println("\n### Flux.timestamp()\n")
+    println("\n### Flux.timed().elapsed()\n")
+
+    group1.timed()
+        .elapsed()
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n### Flux.timed().timestamp()\n")
 
     group1.timed()
         .timestamp()
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n### Flux.elapsed()\n") // legacy
+
+    group1.elapsed()
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n### Flux.timestamp()\n") // legacy
+
+    group1.timestamp()
         .log()
         .subscribe { println("subscribe: $it") }
 
@@ -1006,25 +1031,55 @@ fun main(args: Array<String>) {
 
 // console
 
-### Flux.elapsed()
+### Flux.timed()
 
 [ INFO] (main) onSubscribe(FluxTimed.TimedSubscriber)
 [ INFO] (main) request(unbounded)
-[ INFO] (main) onNext(Timed(Person(name=choi, age=29)){eventElapsedNanos=28552650, eventElapsedSinceSubscriptionNanos=28552650,  eventTimestampEpochMillis=1656372127034})
-subscribe: Timed(Person(name=choi, age=29)){eventElapsedNanos=28552650, eventElapsedSinceSubscriptionNanos=28552650,  eventTimestampEpochMillis=1656372127034}
-[ INFO] (main) onNext(Timed(Person(name=woo, age=31)){eventElapsedNanos=1098779, eventElapsedSinceSubscriptionNanos=29651429,  eventTimestampEpochMillis=1656372127035})
-subscribe: Timed(Person(name=woo, age=31)){eventElapsedNanos=1098779, eventElapsedSinceSubscriptionNanos=29651429,  eventTimestampEpochMillis=1656372127035}
+[ INFO] (main) onNext(Timed(Person(name=choi, age=29)){eventElapsedNanos=30310270, eventElapsedSinceSubscriptionNanos=30310270,  eventTimestampEpochMillis=1656543181785})
+subscribe: Timed(Person(name=choi, age=29)){eventElapsedNanos=30310270, eventElapsedSinceSubscriptionNanos=30310270,  eventTimestampEpochMillis=1656543181785}
+[ INFO] (main) onNext(Timed(Person(name=woo, age=31)){eventElapsedNanos=1200710, eventElapsedSinceSubscriptionNanos=31510980,  eventTimestampEpochMillis=1656543181787})
+subscribe: Timed(Person(name=woo, age=31)){eventElapsedNanos=1200710, eventElapsedSinceSubscriptionNanos=31510980,  eventTimestampEpochMillis=1656543181787}
 [ INFO] (main) onComplete()
 
-### Flux.timestamp()
+### Flux.timed().elapsed()
+
+[ INFO] (main) | onSubscribe([Fuseable] FluxElapsed.ElapsedSubscriber)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext([1,Timed(Person(name=choi, age=29)){eventElapsedNanos=520929, eventElapsedSinceSubscriptionNanos=520929,  eventTimestampEpochMillis=1656543181791}])
+subscribe: [1,Timed(Person(name=choi, age=29)){eventElapsedNanos=520929, eventElapsedSinceSubscriptionNanos=520929,  eventTimestampEpochMillis=1656543181791}]
+[ INFO] (main) | onNext([0,Timed(Person(name=woo, age=31)){eventElapsedNanos=790127, eventElapsedSinceSubscriptionNanos=1311056,  eventTimestampEpochMillis=1656543181791}])
+subscribe: [0,Timed(Person(name=woo, age=31)){eventElapsedNanos=790127, eventElapsedSinceSubscriptionNanos=1311056,  eventTimestampEpochMillis=1656543181791}]
+[ INFO] (main) | onComplete()
+
+### Flux.timed().timestamp()
 
 [ INFO] (main) onSubscribe(FluxMap.MapSubscriber)
 [ INFO] (main) request(unbounded)
-[ INFO] (main) onNext([1656372127038,Timed(Person(name=choi, age=29)){eventElapsedNanos=778372, eventElapsedSinceSubscriptionNanos=778372,  eventTimestampEpochMillis=1656372127038}])
-subscribe: [1656372127038,Timed(Person(name=choi, age=29)){eventElapsedNanos=778372, eventElapsedSinceSubscriptionNanos=778372,  eventTimestampEpochMillis=1656372127038}]
-[ INFO] (main) onNext([1656372127039,Timed(Person(name=woo, age=31)){eventElapsedNanos=465446, eventElapsedSinceSubscriptionNanos=1243818,  eventTimestampEpochMillis=1656372127039}])
-subscribe: [1656372127039,Timed(Person(name=woo, age=31)){eventElapsedNanos=465446, eventElapsedSinceSubscriptionNanos=1243818,  eventTimestampEpochMillis=1656372127039}]
+[ INFO] (main) onNext([1656543181794,Timed(Person(name=choi, age=29)){eventElapsedNanos=835252, eventElapsedSinceSubscriptionNanos=835252,  eventTimestampEpochMillis=1656543181794}])
+subscribe: [1656543181794,Timed(Person(name=choi, age=29)){eventElapsedNanos=835252, eventElapsedSinceSubscriptionNanos=835252,  eventTimestampEpochMillis=1656543181794}]
+[ INFO] (main) onNext([1656543181794,Timed(Person(name=woo, age=31)){eventElapsedNanos=298698, eventElapsedSinceSubscriptionNanos=1133950,  eventTimestampEpochMillis=1656543181794}])
+subscribe: [1656543181794,Timed(Person(name=woo, age=31)){eventElapsedNanos=298698, eventElapsedSinceSubscriptionNanos=1133950,  eventTimestampEpochMillis=1656543181794}]
 [ INFO] (main) onComplete()
+
+### Flux.elapsed()
+
+[ INFO] (main) | onSubscribe([Fuseable] FluxElapsed.ElapsedSubscriber)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext([1,Person(name=choi, age=29)])
+subscribe: [1,Person(name=choi, age=29)]
+[ INFO] (main) | onNext([0,Person(name=woo, age=31)])
+subscribe: [0,Person(name=woo, age=31)]
+[ INFO] (main) | onComplete()
+
+### Flux.timestamp()
+
+[ INFO] (main) | onSubscribe([Fuseable] FluxMapFuseable.MapFuseableSubscriber)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext([1656543181798,Person(name=choi, age=29)])
+subscribe: [1656543181798,Person(name=choi, age=29)]
+[ INFO] (main) | onNext([1656543181798,Person(name=woo, age=31)])
+subscribe: [1656543181798,Person(name=woo, age=31)]
+[ INFO] (main) | onComplete()
 
 ### Flux.delayElements()
 
@@ -1035,7 +1090,310 @@ subscribe: Person(name=choi, age=29)
 [ INFO] (parallel-2) onNext(Person(name=woo, age=31))
 subscribe: Person(name=woo, age=31)
 [ INFO] (parallel-2) onComplete()
+
 ```
+
+
+
+# Flux 쪼개기
+
+## window(), windowTimeout(), windowUntil(), windowWhile()
+
+`window()`를 사용하면 인자로 주어진 값의 크기만큼 `Flux` 를 여러개의 `Flux` 로 분할할 수 있다. 
+
+`windowTimeout()` 를 사용하면 인자로 넘긴 `Duration` 만큼의 추가적인 window가 들어간다고 생각하면 편할 것 같다. 최대 갯수 + 시간 window 별로 여러개의 `Flux`로 분할할 수 있다.
+
+`windowUntil()` 을 사용하면 인자로 넘긴 `Predicate`가 true가 될 때마다 `Flux` 로 방출한다. 반대로 `windowWhile()` 을 사용하면  인자로 넘긴 `Predicate`가 false가 되면 `Flux`로 방출한다.
+
+```kotlin
+package me.sup2is.reactiveexam.ch07
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+import java.time.Duration
+
+fun main(args: Array<String>) {
+
+    val group1 = Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31),
+        Person(name = "yoon", age = 30),
+        Person(name = "hwang", age = 30)
+    )
+
+    println("\n### Flux.window()\n")
+
+    group1.window(2)
+        .flatMap {
+            println("slice")
+            it
+        }
+        .log()
+        .subscribe()
+
+    println("\n### Flux.windowTimeout()\n")
+
+    group1.windowTimeout(2, Duration.ofMillis(500))
+        .flatMap {
+            println("slice")
+            it
+        }
+        .log()
+        .subscribe()
+
+    println("\n### Flux.windowUntil()\n")
+
+    group1.windowWhile() { it.age >= 30 }
+        .flatMap {
+            println("slice")
+            it
+        }
+        .log()
+        .subscribe()
+
+}
+
+// console
+
+### Flux.window()
+
+[ INFO] (main) onSubscribe(FluxFlatMap.FlatMapMain)
+[ INFO] (main) request(unbounded)
+slice
+[ INFO] (main) onNext(Person(name=choi, age=29))
+[ INFO] (main) onNext(Person(name=woo, age=31))
+slice
+[ INFO] (main) onNext(Person(name=yoon, age=30))
+[ INFO] (main) onNext(Person(name=hwang, age=30))
+[ INFO] (main) onComplete()
+
+### Flux.windowTimeout()
+
+[ INFO] (main) onSubscribe(FluxFlatMap.FlatMapMain)
+[ INFO] (main) request(unbounded)
+slice
+[ INFO] (main) onNext(Person(name=choi, age=29))
+[ INFO] (main) onNext(Person(name=woo, age=31))
+slice
+[ INFO] (main) onNext(Person(name=yoon, age=30))
+[ INFO] (main) onNext(Person(name=hwang, age=30))
+slice
+[ INFO] (main) onComplete()
+
+### Flux.windowUntil()
+
+[ INFO] (main) onSubscribe(FluxFlatMap.FlatMapMain)
+[ INFO] (main) request(unbounded)
+slice
+slice
+[ INFO] (main) onNext(Person(name=woo, age=31))
+[ INFO] (main) onNext(Person(name=yoon, age=30))
+[ INFO] (main) onNext(Person(name=hwang, age=30))
+[ INFO] (main) onComplete()
+
+```
+
+
+
+## buffer(), bufferUntil(), bufferWhile(), groupBy()
+
+`buffer()` 를 사용하면 인자로 넘어간 크기만큼 요소를 묶어서 `Mono<MutableList<T>>` 으로 방출한다.  
+
+`bufferUntil()` 을 사용하면 인자로 넘긴 `Predicate`가 true가 될 때마다  `Mono<MutableList<T>>`  로 방출한다. 반대로 `bufferWhile()` 을 사용하면  인자로 넘긴 `Predicate`가 false가 되면  `Mono<MutableList<T>>` 로 방출한다.
+
+`groupBy()` 를 사용하면 요소들을 특정 키값으로 grouping 할 수 있다. keyMapper는 카디널리티가 낮을 때 가장 잘 동작한다.
+
+```kotlin
+package me.sup2is.reactiveexam.ch07
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+
+fun main(args: Array<String>) {
+
+    val group1 = Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31),
+        Person(name = "yoon", age = 30),
+        Person(name = "hwang", age = 30)
+    )
+
+    println("\n### Flux.buffer()\n")
+
+    group1.buffer(2) // return Mono<MutableList<T>>
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n### Flux.bufferUntil()\n")
+
+    group1.bufferUntil { it.age >= 30 } // return Mono<MutableList<T>>
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n### Flux.bufferWhile()\n")
+
+    group1.bufferWhile { it.age >= 30 } // return Mono<MutableList<T>>
+        .log()
+        .subscribe { println("subscribe: $it") }
+
+    println("\n### Flux.groupBy()\n")
+
+    group1.groupBy { it.age }
+        .flatMap {
+            println("key: ${it.key()}")
+            it
+        }
+        .log()
+        .subscribe { println("subscribe: $it") }
+}
+
+// console
+
+### Flux.buffer()
+
+[ INFO] (main) onSubscribe(FluxBuffer.BufferExactSubscriber)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext([Person(name=choi, age=29), Person(name=woo, age=31)])
+subscribe: [Person(name=choi, age=29), Person(name=woo, age=31)]
+[ INFO] (main) onNext([Person(name=yoon, age=30), Person(name=hwang, age=30)])
+subscribe: [Person(name=yoon, age=30), Person(name=hwang, age=30)]
+[ INFO] (main) onComplete()
+
+### Flux.bufferUntil()
+
+[ INFO] (main) onSubscribe(FluxBufferPredicate.BufferPredicateSubscriber)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext([Person(name=choi, age=29), Person(name=woo, age=31)])
+subscribe: [Person(name=choi, age=29), Person(name=woo, age=31)]
+[ INFO] (main) onNext([Person(name=yoon, age=30)])
+subscribe: [Person(name=yoon, age=30)]
+[ INFO] (main) onNext([Person(name=hwang, age=30)])
+subscribe: [Person(name=hwang, age=30)]
+[ INFO] (main) onComplete()
+
+### Flux.bufferWhile()
+
+[ INFO] (main) onSubscribe(FluxBufferPredicate.BufferPredicateSubscriber)
+[ INFO] (main) request(unbounded)
+[ INFO] (main) onNext([Person(name=woo, age=31), Person(name=yoon, age=30), Person(name=hwang, age=30)])
+subscribe: [Person(name=woo, age=31), Person(name=yoon, age=30), Person(name=hwang, age=30)]
+[ INFO] (main) onComplete()
+
+### Flux.groupBy()
+
+[ INFO] (main) onSubscribe(FluxFlatMap.FlatMapMain)
+[ INFO] (main) request(unbounded)
+key: 29
+[ INFO] (main) onNext(Person(name=choi, age=29))
+subscribe: Person(name=choi, age=29)
+key: 31
+[ INFO] (main) onNext(Person(name=woo, age=31))
+subscribe: Person(name=woo, age=31)
+key: 30
+[ INFO] (main) onNext(Person(name=yoon, age=30))
+subscribe: Person(name=yoon, age=30)
+[ INFO] (main) onNext(Person(name=hwang, age=30))
+subscribe: Person(name=hwang, age=30)
+[ INFO] (main) onComplete()
+```
+
+
+
+# Blocking 하기
+
+## blockFirst(), blockLast(), toIterable(), toStream(), block(), toFuture()
+
+`blockFirst()` 를 사용하면 `Flux` 에서 첫 번째 요소를 보낼 때까지 blocking을 시도한다. 해당 값을 반환하거나 `Flux`가 비어있으면 null을 리턴한다. `blockLast()`는 마지막 요소를 보낼 때까지 blocking을 시도한다. 인자로 timeout 값을 넘길 수 있는데 만약 그냥 사용한다면 무기한 blocking을 시도한다.
+
+`toIterable()` 로 `Flux`를 `Iterable` 로 변환할 수 있고 `toStream()`으로 자바8의 `Stream`으로 변환할 수 있다.
+
+`Mono`전용으로 `block()`과 `toFuture()`를 사용할 수 있다. 마찬가지로  `block`은 요소가 넘어올 때까지 blocking을 시도하고 `toFuture()`는 `CompletableFuture` 타입으로 받을 수 있다.
+
+```kotlin
+package me.sup2is.reactiveexam.ch08
+
+import me.sup2is.reactiveexam.Person
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+
+fun main(args: Array<String>) {
+
+    val group1 = Flux.just(
+        Person(name = "choi", age = 29),
+        Person(name = "woo", age = 31),
+        Person(name = "yoon", age = 30),
+        Person(name = "hwang", age = 30)
+    )
+
+    println("\n### Flux.blockFirst()\n")
+
+    val blockFirst = group1.blockFirst()
+
+    println("blockFirst: $blockFirst")
+
+    println("\n### Flux.blockLast()\n")
+
+    val blockLast = group1.blockLast()
+    println("blockLast: $blockLast")
+
+    println("\n### Flux.toIterable()\n")
+
+    group1.toIterable()
+        .forEach { println("iterable: $it") }
+
+    println("\n### Flux.toStream()\n")
+
+    group1.toStream()
+        .map { it.name }
+        .forEach { println("toStream: $it") }
+
+    println("\n### Mono.block()\n")
+
+    val block = Mono.just(Person(name = "choi", age = 29)).block()
+    println("block: $block")
+
+    println("\n### Mono.toFuture()\n")
+
+    val toFuture = Mono.just(Person(name = "choi", age = 29)).toFuture().get()
+    println("toFuture: $toFuture")
+}
+
+// console
+
+### Flux.blockFirst()
+
+blockFirst: Person(name=choi, age=29)
+
+### Flux.blockLast()
+
+blockLast: Person(name=hwang, age=30)
+
+### Flux.toIterable()
+
+iterable: Person(name=choi, age=29)
+iterable: Person(name=woo, age=31)
+iterable: Person(name=yoon, age=30)
+iterable: Person(name=hwang, age=30)
+
+### Flux.toStream()
+
+toStream: choi
+toStream: woo
+toStream: yoon
+toStream: hwang
+
+### Mono.block()
+
+block: Person(name=choi, age=29)
+
+### Mono.toFuture()
+
+toFuture: Person(name=choi, age=29)
+```
+
+# 정리
+
+`Flux`, `Mono` 에서 제공해주는 API가 정말 너무 많다보니까 가볍게 docs를 한번 읽어보고 나중에 '이런게 있었던 것 같은데?' 라는 시점에 docs를 확인하면서 필요한 메서드를 찾는게 효율적일 것 같다.
 
 
 
