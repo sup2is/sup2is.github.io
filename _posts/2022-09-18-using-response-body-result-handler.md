@@ -10,6 +10,17 @@ comments: true
 
 
 
+# Table Of Contents
+
+* [Overview](#overview)
+* [ResponseBodyResultHandler가 필요한 상황](#responsebodyresulthandler가-필요한-상황)
+* [ResponseBodyResultHandler 알아보기](#responsebodyresulthandler-알아보기)
+* [ResponseBodyResultHandler 적용하기](#responsebodyresulthandler-적용하기)
+* [ResponseBodyResultHandler 동작 확인하기](#responsebodyresulthandler-동작-확인하기)
+* [정리](#정리)
+
+
+
 # Overview
 
 이번시간에는 ResponseBodyResultHandler를 사용해서 response 타입에 대한 공동처리를 하는 방법에 대해서 알아보도록 하겠다.
@@ -322,7 +333,7 @@ class ResponseWrapperTest {
 
 <br>
 
-- **[References]**
-  - [https://stackoverflow.com/questions/71084011/spring-webflux-add-a-wrapping-class-before-serialization](https://stackoverflow.com/questions/71084011/spring-webflux-add-a-wrapping-class-before-serialization)
-  - [https://dreamchaser3.tistory.com/12](https://dreamchaser3.tistory.com/12)
-  
+**[References]**
+
+- [https://stackoverflow.com/questions/71084011/spring-webflux-add-a-wrapping-class-before-serialization](https://stackoverflow.com/questions/71084011/spring-webflux-add-a-wrapping-class-before-serialization)
+- [https://dreamchaser3.tistory.com/12](https://dreamchaser3.tistory.com/12)
