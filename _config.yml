@@ -11,17 +11,20 @@ theme_settings :
   profile :
     image : assets/img/main.jpg
     username : HyeonSeop Choi
-    description : 안녕하세요 저는 Junior java developer 입니다. 배우고 싶은 기술이나 TIL 관련 글을 포스팅하는 블로그입니다. 부족한 실력이라 영어 문장에 오역이 있을 수 있고 잘못된 지식을 전파 할 수 있습니다. 피드백은 언제나 환영합니다. :) 감사합니다.
+    description : 안녕하세요 저는 Java와 Kotlin을 좋아하는 개발자 입니다. 이 블로그는 배우고 싶은 기술이나 TIL 관련 글을 포스팅하는 블로그입니다. 부족한 실력이라 영어 문장에 오역이 있을 수 있고 잘못된 지식을 전파 할 수 있습니다. 피드백은 언제나 환영합니다. 감사합니다. 😀
     experience :
       - start : 2018-09-17
         end : 2020-04-14
-        experience : Paycoms - Java Backend Developer
+        experience : Paycoms - Backend Developer
       - start : 2020-05-06
-        experience : ESTGames - Java Backend Developer
+        experience : ESTGames - Backend Developer
         end : 2021-05-14
       - start : 2021-05-31
-        experience : 42dot - Java Backend Developer
+        experience : 42dot - Backend Developer
         end : 2022-06-02
+      - start : 2021-06-07
+        experience : Naver Financial - Backend Developer
+
     skills : 
       - skill : Java
         value : 80  # Percent value
@@ -30,7 +33,7 @@ theme_settings :
       - skill : RDB
         value : 70  # Percent value
       - skill : Kotlin
-        value : 50  # Percent value
+        value : 70  # Percent value
       - skill : NoSQL
         value : 50  # Percent value
       - skill : HTML5 & CSS3 & JQuery
