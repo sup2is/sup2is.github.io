@@ -62,7 +62,7 @@ management:
         include: prometheus
 ```
 
-의존성 + application.yaml이 준비되었으면 서버를 올려서 [http://localhost:8080/actuator/prometheus](http://localhost:8080/actuator/prometheus) 에 접속하자. 그러면 아래에서 여러 메트릭정보들을 확인할 수 있다.
+프로메테우스 의존성 + application.yaml이 준비되었으면 서버를 올려서 [http://localhost:8080/actuator/prometheus](http://localhost:8080/actuator/prometheus) 을 확인해보자. 아래와 같은 여러 메트릭정보들을 확인할 수 있다.
 
 ```
 # HELP mongodb_driver_pool_size the current size of the connection pool, including idle and and in-use members
@@ -100,7 +100,45 @@ Intellij에서 `MetricsAutoConfiguration`으로 검색하면 수많은 클래스
 
 
 
+사진
+
 이제 metric 정보들은 준비가 되었으니 prometheus와 grafana를 올려서 테스트해보자.
+
+```
+// grafana
+
+docker run -d -p 3000:3000 grafana/grafana-enterprise
+
+// prometheus
+
+docker run \
+    -p 9090:9090 \
+    -v /path/to/prometheus.yml:/etc/prometheus/prometheus.yml \
+    prom/prometheus
+
+
+// prometheus.yaml
+
+global:
+  scrape_interval: 10s # 10초 마다 Metric을 Pulling
+  evaluation_interval: 10s
+scrape_configs:
+  - job_name: 'spring-boot-app'
+    metrics_path: '/actuator/prometheus' # Application prometheus endpoint
+    static_configs:
+      - targets: ['host.docker.internal:8080'] # Application host:port
+
+```
+
+
+
+
+
+
+
+
+
+
 
 
 
