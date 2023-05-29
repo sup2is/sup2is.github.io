@@ -9,6 +9,9 @@
       <a href="{{ site.url }}">
         <li class="btn-nav">Blog</li>
       </a>
+      <a href="{{ site.url }}/TIL">
+        <li class="btn-nav">TIL</li>
+      </a>
       <li class="current">Tags</li>
       <a href="{{ site.url }}/portfolio">
         <li class="btn-nav">Portfolio</li>
@@ -21,6 +24,9 @@
       <a href="{{ site.url }}">
         <li class="btn-nav">Blog</li>
       </a>
+      <a href="{{ site.url }}/TIL">
+        <li class="btn-nav">TIL</li>
+      </a>
       <a href="{{ site.url }}/tags">
         <li class="btn-nav">Tags</li>
       </a>
@@ -32,6 +38,9 @@
       <a href="{{ site.url }}">
         <li class="btn-nav">Blog</li>
       </a>
+      <a href="{{ site.url }}/TIL">
+        <li class="btn-nav">TIL</li>
+      </a>
       <a href="{{ site.url }}/tags">
         <li class="btn-nav">Tags</li>
       </a>
@@ -39,10 +48,27 @@
         <li class="btn-nav">Portfolio</li>
       </a>
       <li class="current">Books</li>
+      {% when 'TIL'%}
+      <a href="{{ site.url }}">
+        <li class="btn-nav">Blog</li>
+      </a>
+      <li class="current">TIL</li>
+      <a href="{{ site.url }}/tags">
+        <li class="btn-nav">Tags</li>
+      </a>
+      <a href="{{ site.url }}/portfolio">
+        <li class="btn-nav">Portfolio</li>
+      </a>
+      <a href="{{ site.url }}/books">
+        <li class="btn-nav">Books</li>
+      </a>
       {% else %}
       <!-- others -->
       <a href="{{ site.url }}">
         <li class="current btn-nav">Blog</li>
+      </a>
+      <a href="{{ site.url }}/TIL">
+        <li class="btn-nav">TIL</li>
       </a>
       <a href="{{ site.url }}/tags">
         <li class="btn-nav">Tags</li>

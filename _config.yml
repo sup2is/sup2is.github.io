@@ -64,6 +64,7 @@ theme_settings :
 paginate: 7
 paginate_path: "blog/page:num"
 
+
 # Build Ssttings
 sass:
   sass_dir: _sass
@@ -75,3 +76,7 @@ bootstrap:
 lang: ko_KR
 
 google_analytics: UA-136379787-1
+
+collections:
+  til:
+    output: true
